@@ -21,3 +21,24 @@ test("ship factory function - 3", () => {
     sunk: true,
   });
 });
+
+test("hit boat - 1", () => {
+  expect(hit(newShip(3, 1, false))).toStrictEqual({
+    length: 3,
+    hits: 2,
+    sunk: false,
+  });
+});
+
+test("hit boat -2", () => {
+  expect(() => {
+    const testBoat = newShip(4, 0, false);
+    hit(testBoat);
+    hit(testBoat);
+    return hit(testBoat);
+  }).toStrictEqual({
+    length: 4,
+    hits: 3,
+    sunk: false,
+  });
+});
