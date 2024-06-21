@@ -1,3 +1,5 @@
+import { newShip, hit, isSunk } from "./script.js";
+
 test("ship factory function", () => {
   expect(newShip(3, 0, false)).toStrictEqual({
     length: 3,
@@ -41,4 +43,25 @@ test("hit boat -2", () => {
     hits: 3,
     sunk: false,
   });
+});
+
+test("Sunk - 1", () => {
+  expect(() => {
+    const testBoat2 = newShip(4, 4, false);
+    return isSunk(testBoat2);
+  }).toBe(true);
+});
+
+test("Sunk - 2", () => {
+  expect(() => {
+    const testBoat3 = newShip(1, 1, false);
+    return isSunk(testBoat3);
+  }).toBe(true);
+});
+
+test("Sunk - 3", () => {
+  expect(() => {
+    const testBoat3 = newShip(3, 1, false);
+    return isSunk(testBoat3);
+  }).toBe(false);
 });
