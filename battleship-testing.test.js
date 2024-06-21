@@ -1,4 +1,4 @@
-import { newShip, hit, isSunk } from "./script.js";
+import { newShip, isSunk } from "./src/ship-factory.js";
 
 test("ship factory function", () => {
   expect(newShip(3, 0, false)).toStrictEqual({
@@ -51,3 +51,7 @@ test("Sunk - 2", () => {
 test("Sunk - 3", () => {
   expect(isSunk(newShip(3, 1, false))).toBe(false);
 });
+
+// test('Creating player gameboard - empty', () => {
+//     expect(newGameboard())
+// })
