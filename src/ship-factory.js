@@ -5,6 +5,7 @@ function newShip(length, hits, sunk) {
     sunk: sunk,
     hit() {
       this.hits += 1;
+      return this;
     },
   };
 }
@@ -13,7 +14,5 @@ function isSunk(ship) {
   if (ship.hits === ship.length) return true;
   else return false;
 }
-
-console.log(newShip(3, 2, false));
 
 export { newShip, isSunk };

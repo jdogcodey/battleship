@@ -25,7 +25,7 @@ test("ship factory function - 3", () => {
 });
 
 test("hit boat - 1", () => {
-  expect(hit(newShip(3, 1, false))).toStrictEqual({
+  expect(newShip(3, 1, false).hit()).toMatchObject({
     length: 3,
     hits: 2,
     sunk: false,
@@ -33,7 +33,7 @@ test("hit boat - 1", () => {
 });
 
 test("hit boat -2", () => {
-  expect(hit(hit(hit(newShip(4, 0, false))))).toStrictEqual({
+  expect(newShip(4, 0, false).hit().hit().hit()).toMatchObject({
     length: 4,
     hits: 3,
     sunk: false,
