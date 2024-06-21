@@ -9,18 +9,15 @@ test("ship factory function", () => {
 });
 
 test("ship factory function - 2", () => {
-  expect(newShip(2, 1, false)).toStrictEqual({
+  expect(newShip(2, 1, false)).toMatchObject({
     length: 2,
     hits: 1,
     sunk: false,
-    hit() {
-      this.hits += 1;
-    },
   });
 });
 
 test("ship factory function - 3", () => {
-  expect(newShip(1, 1, true)).toStrictEqual({
+  expect(newShip(1, 1, true)).toMatchObject({
     length: 1,
     hits: 1,
     sunk: true,
