@@ -1,7 +1,7 @@
-import { newShip, isSunk } from "./src/ship-factory.js";
+import { newShip } from "./src/ship-factory.js";
 
 test("ship factory function", () => {
-  expect(newShip(3, 0, false)).toMatchObject({
+  expect(newShip(3)).toMatchObject({
     length: 3,
     hits: 0,
     sunk: false,
@@ -9,31 +9,31 @@ test("ship factory function", () => {
 });
 
 test("ship factory function - 2", () => {
-  expect(newShip(2, 1, false)).toMatchObject({
+  expect(newShip(2)).toMatchObject({
     length: 2,
-    hits: 1,
+    hits: 0,
     sunk: false,
   });
 });
 
 test("ship factory function - 3", () => {
-  expect(newShip(1, 1, true)).toMatchObject({
+  expect(newShip(1)).toMatchObject({
     length: 1,
-    hits: 1,
-    sunk: true,
+    hits: 0,
+    sunk: false,
   });
 });
 
 test("hit boat - 1", () => {
-  expect(newShip(3, 1, false).hit()).toMatchObject({
+  expect(newShip(3).hit()).toMatchObject({
     length: 3,
-    hits: 2,
+    hits: 1,
     sunk: false,
   });
 });
 
 test("hit boat -2", () => {
-  expect(newShip(4, 0, false).hit().hit().hit()).toMatchObject({
+  expect(newShip(4).hit().hit().hit()).toMatchObject({
     length: 4,
     hits: 3,
     sunk: false,
@@ -41,15 +41,27 @@ test("hit boat -2", () => {
 });
 
 test("Sunk - 1", () => {
-  expect(isSunk(newShip(4, 4, false))).toBe(true);
+  expect(newShip(4).hit().hit().hit().hit()).toMatchObject({
+    length: 4,
+    hits: 4,
+    sunk: true,
+  });
 });
 
 test("Sunk - 2", () => {
-  expect(isSunk(newShip(1, 1, false))).toBe(true);
+  expect(newShip(1).hit()).toMatchObject({
+    length: 1,
+    hits: 1,
+    sunk: true,
+  });
 });
 
 test("Sunk - 3", () => {
-  expect(isSunk(newShip(3, 1, false))).toBe(false);
+  expect(newShip(3).hit()).toMatchObject({
+    length: 3,
+    hits: 1,
+    sunk: false,
+  });
 });
 
 // test('Creating player gameboard - empty', () => {

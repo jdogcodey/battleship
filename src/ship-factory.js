@@ -1,18 +1,19 @@
-function newShip(length, hits, sunk) {
+function newShip(length) {
   return {
     length: length,
-    hits: hits,
-    sunk: sunk,
+    hits: 0,
+    sunk: false,
+    isSunk() {
+      if (this.hits === this.length) {
+        this.sunk = true;
+      }
+    },
     hit() {
       this.hits += 1;
+      this.isSunk();
       return this;
     },
   };
 }
 
-function isSunk(ship) {
-  if (ship.hits === ship.length) return true;
-  else return false;
-}
-
-export { newShip, isSunk };
+export { newShip };
