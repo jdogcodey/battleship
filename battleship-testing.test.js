@@ -41,22 +41,13 @@ test("hit boat -2", () => {
 });
 
 test("Sunk - 1", () => {
-  expect(() => {
-    const testBoat2 = newShip(4, 4, false);
-    return isSunk(testBoat2);
-  }).toBe(true);
+  expect(isSunk(newShip(4, 4, false))).toBe(true);
 });
 
 test("Sunk - 2", () => {
-  expect(() => {
-    const testBoat3 = newShip(1, 1, false);
-    return isSunk(testBoat3);
-  }).toBe(true);
+  expect(isSunk(newShip(1, 1, false))).toBe(true);
 });
 
 test("Sunk - 3", () => {
-  expect(() => {
-    const testBoat3 = newShip(3, 1, false);
-    return isSunk(testBoat3);
-  }).toBe(false);
+  expect(isSunk(newShip(3, 1, false))).toBe(false);
 });
