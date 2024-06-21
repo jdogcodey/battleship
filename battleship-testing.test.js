@@ -33,12 +33,7 @@ test("hit boat - 1", () => {
 });
 
 test("hit boat -2", () => {
-  expect(() => {
-    const testBoat = newShip(4, 0, false);
-    hit(testBoat);
-    hit(testBoat);
-    return hit(testBoat);
-  }).toStrictEqual({
+  expect(hit(hit(hit(newShip(4, 0, false))))).toStrictEqual({
     length: 4,
     hits: 3,
     sunk: false,

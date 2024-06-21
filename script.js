@@ -7,7 +7,8 @@ function newShip(length, hits, sunk) {
 }
 
 function hit(ship) {
-  ship.hit += 1;
+  ship.hits += 1;
+  return ship;
 }
 
 function isSunk(ship) {
