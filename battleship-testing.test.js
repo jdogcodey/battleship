@@ -1,7 +1,7 @@
 import { newShip, isSunk } from "./src/ship-factory.js";
 
 test("ship factory function", () => {
-  expect(newShip(3, 0, false)).toStrictEqual({
+  expect(newShip(3, 0, false)).toMatchObject({
     length: 3,
     hits: 0,
     sunk: false,
@@ -13,6 +13,9 @@ test("ship factory function - 2", () => {
     length: 2,
     hits: 1,
     sunk: false,
+    hit() {
+      this.hits += 1;
+    },
   });
 });
 

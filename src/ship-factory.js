@@ -14,4 +14,6 @@ function isSunk(ship) {
   else return false;
 }
 
+console.log(newShip(3, 2, false));
+
 export { newShip, isSunk };
