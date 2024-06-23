@@ -59,6 +59,12 @@ function newGameboard() {
         ) {
           this.ships[this.shipPositions[i][2]].hit();
           this.shipPositions.splice(i, 1);
+          for (let n = 0; n < this.ships.length; n++) {
+            if (this.ships[n].sunk === false) return;
+            else {
+              this.allShipsSunk = true;
+            }
+          }
           return;
         }
       }

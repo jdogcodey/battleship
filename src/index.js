@@ -11,9 +11,12 @@ testGameboard.receiveAttack([2, 1]);
 testGameboard.receiveAttack([3, 1]);
 testGameboard.receiveAttack([4, 1]);
 testGameboard.receiveAttack([5, 1]);
+testGameboard.receiveAttack([0, 0]);
+// testGameboard.receiveAttack([1, 0]);
 testGameboard.receiveAttack([4, 6]);
-console.log(testGameboard.shipPositions);
+// console.log(testGameboard.shipPositions);
 
-console.log(testGameboard.ships);
-console.log(testGameboard.shipPositions);
-console.log(testGameboard.missedAttacks);
+// console.log(testGameboard.ships);
+// console.log(testGameboard.shipPositions);
+// console.log(testGameboard.missedAttacks);
+console.log(testGameboard.allShipsSunk);
