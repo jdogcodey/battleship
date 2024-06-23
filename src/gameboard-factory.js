@@ -8,7 +8,6 @@ function newGameboard() {
     ships: [],
     shipPositions: [],
     shipCounter: 0,
-    // Each position in array represents a different ship [0](current number 1) being carrier, [4](current number 5) being patrol boats etc.
     addShip(firstCoord, secondCoord) {
       const [a, b] = firstCoord;
       const [x, y] = secondCoord;
@@ -29,27 +28,28 @@ function newGameboard() {
         length = Math.abs(b - y);
         if (b > y) {
           for (let j = 0; j === b - y; j++) {
-            this.shipPositions.push([a, y + j, shipCounter]);
+            this.shipPositions.push([a, y + j, this.shipCounter]);
           }
         } else {
           for (let k = 0; k === y - b; k++) {
-            this.shipPositions.push([a, b + k, shipCounter]);
+            this.shipPositions.push([a, b + k, this.shipCounter]);
           }
         }
       } else {
         length = Math.abs(a - x);
         if (a > x) {
           for (let l = 0; l === a - x; l++) {
-            this.shipPositions.push([x + l, y, shipCounter]);
+            this.shipPositions.push([x + l, y, this.shipCounter]);
           }
         } else {
           for (let m = 0; m === x - a; m++) {
-            this.shipPositions.push([a + l, y, shipCounter]);
+            this.shipPositions.push([a + l, y, this.shipCounter]);
+            s;
           }
         }
       }
       this.ships.push(newShip(length));
-      shipCounter++;
+      this.shipCounter++;
     },
     receiveAttack(coords) {
       for (let i = 0; i < this.shipPositions.length; i++) {
@@ -67,4 +67,4 @@ function newGameboard() {
   };
 }
 
-export {};
+export { newGameboard };

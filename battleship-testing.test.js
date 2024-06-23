@@ -1,4 +1,5 @@
 import { newShip } from "./src/ship-factory.js";
+import { newGameboard } from "./src/gameboard-factory.js";
 
 test("ship factory function", () => {
   expect(newShip(3)).toMatchObject({
@@ -64,6 +65,11 @@ test("Sunk - 3", () => {
   });
 });
 
-// test('Creating player gameboard - empty', () => {
-//     expect(newGameboard())
-// })
+const testGameboard = newGameboard();
+testGameboard.addShip([0, 0], [1, 0]);
+
+test("Creating player gameboard - one ship", () => {
+  expect(testGameboard.ships).toMatchObject([
+    { length: 1, hits: 0, sunk: false },
+  ]);
+});

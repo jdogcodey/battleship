@@ -1,17 +1,9 @@
 import _ from "lodash";
 import { testgame } from "./gameboard-factory.js";
 import { testShip } from "./ship-factory.js";
+import { newGameboard } from "./gameboard-factory.js";
 
-function component() {
-  const element = document.createElement("div");
+const testGameboard = newGameboard();
+testGameboard.addShip([0, 0], [1, 0]);
 
-  // Lodash, now imported by this script
-  element.innerHTML = _.join(["Hello", "webpack"], " ");
-
-  return element;
-}
-
-document.body.appendChild(component());
-
-testgame();
-testShip();
+console.log(testGameboard.ships);
