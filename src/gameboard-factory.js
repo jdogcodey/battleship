@@ -27,24 +27,24 @@ function newGameboard() {
       if (a === x) {
         length = Math.abs(b - y) + 1;
         if (b > y) {
-          for (let j = 0; j === b - y; j++) {
+          for (let j = 0; j <= b - y; j++) {
             this.shipPositions.push([a, y + j, this.shipCounter]);
           }
         } else {
-          for (let k = 0; k === y - b; k++) {
+          for (let k = 0; k <= y - b; k++) {
             this.shipPositions.push([a, b + k, this.shipCounter]);
           }
         }
       } else {
         length = Math.abs(a - x) + 1;
         if (a > x) {
-          for (let l = 0; l === a - x; l++) {
+          for (let l = 0; l <= a - x; l++) {
             this.shipPositions.push([x + l, y, this.shipCounter]);
           }
         } else {
-          for (let m = 0; m === x - a; m++) {
-            this.shipPositions.push([a + l, y, this.shipCounter]);
-            s;
+          console.log(x - a);
+          for (let m = 0; m <= x - a; m++) {
+            this.shipPositions.push([a + m, y, this.shipCounter]);
           }
         }
       }
@@ -52,16 +52,17 @@ function newGameboard() {
       this.shipCounter++;
     },
     receiveAttack(coords) {
+      console.log("attack received");
       for (let i = 0; i < this.shipPositions.length; i++) {
         if (
           coords[0] === this.shipPositions[i][0] &&
           coords[1] === this.shipPositions[i][1]
         ) {
           this.ships[this.shipPositions[i][2]].hit();
+          this.shipPositions.splice(i, 1);
           return;
         }
         this.missedAttacks.push(coords);
-        return;
       }
     },
   };
