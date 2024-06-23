@@ -67,9 +67,17 @@ test("Sunk - 3", () => {
 
 const testGameboard = newGameboard();
 testGameboard.addShip([0, 0], [1, 0]);
+testGameboard.addShip([1, 1], [5, 1]);
+testGameboard.addShip([4, 1], [1, 1]);
 
 test("Creating player gameboard - one ship", () => {
-  expect(testGameboard.ships).toMatchObject([
-    { length: 1, hits: 0, sunk: false },
-  ]);
+  expect(testGameboard.ships[0].length).toBe(2);
+});
+
+test("Creating player gameboard - bigger ship", () => {
+  expect(testGameboard.ships[1].length).toBe(5);
+});
+
+test("Creating player gameboard - reverse ship", () => {
+  expect(testGameboard.ships[2].length).toBe(4);
 });

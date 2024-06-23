@@ -25,7 +25,7 @@ function newGameboard() {
       }
       let length;
       if (a === x) {
-        length = Math.abs(b - y);
+        length = Math.abs(b - y) + 1;
         if (b > y) {
           for (let j = 0; j === b - y; j++) {
             this.shipPositions.push([a, y + j, this.shipCounter]);
@@ -36,7 +36,7 @@ function newGameboard() {
           }
         }
       } else {
-        length = Math.abs(a - x);
+        length = Math.abs(a - x) + 1;
         if (a > x) {
           for (let l = 0; l === a - x; l++) {
             this.shipPositions.push([x + l, y, this.shipCounter]);
