@@ -52,7 +52,6 @@ function newGameboard() {
       this.shipCounter++;
     },
     receiveAttack(coords) {
-      console.log("attack received");
       for (let i = 0; i < this.shipPositions.length; i++) {
         if (
           coords[0] === this.shipPositions[i][0] &&
@@ -62,8 +61,8 @@ function newGameboard() {
           this.shipPositions.splice(i, 1);
           return;
         }
-        this.missedAttacks.push(coords);
       }
+      this.missedAttacks.push(coords);
     },
   };
 }
