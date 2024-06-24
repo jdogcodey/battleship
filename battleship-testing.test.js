@@ -1,5 +1,5 @@
 import { newShip } from "./src/ship-factory.js";
-import { newGameboard } from "./src/gameboard-factory.js";
+import { newGameboard, newGame } from "./src/gameboard-factory.js";
 
 test("ship factory function", () => {
   expect(newShip(3)).toMatchObject({

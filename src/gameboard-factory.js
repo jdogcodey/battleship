@@ -73,4 +73,19 @@ function newGameboard() {
   };
 }
 
-export { newGameboard };
+function newGame() {
+  return {
+    player1: newGameboard(),
+    player2: newGameboard(),
+    winner: null,
+    gameOver() {
+      if (this.player1.allShipsSunk) {
+        this.winner = this.player2;
+      } else if (this.player2.allShipsSunk) {
+        this.winner = this.player1;
+      }
+    },
+  };
+}
+
+export { newGameboard, newGame };
