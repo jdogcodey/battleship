@@ -5,7 +5,7 @@ import { newGameboard, newGame } from "./gameboard-factory.js";
 
 const testGameboard = newGameboard();
 testGameboard.addShip([0, 0], [1, 0]);
-testGameboard.addShip([1, 1], [5, 1]);
+testGameboard.addShip([5, 3], [5, 7]);
 // testGameboard.receiveAttack([1, 1]);
 // testGameboard.receiveAttack([2, 1]);
 // testGameboard.receiveAttack([3, 1]);
@@ -14,7 +14,8 @@ testGameboard.addShip([1, 1], [5, 1]);
 // testGameboard.receiveAttack([0, 0]);
 // testGameboard.receiveAttack([1, 0]);
 // testGameboard.receiveAttack([4, 6]);
-console.log(testGameboard.shipPositions);
+testGameboard.addShip([4, 7], [8, 7]);
+console.log(testGameboard.shipCounter);
 
 // console.log(testGameboard.ships);
 // console.log(testGameboard.shipPositions);

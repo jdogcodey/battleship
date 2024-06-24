@@ -43,7 +43,6 @@ function newGameboard() {
             this.createCoords(shipCoordinates, x + l, y);
           }
         } else {
-          console.log(x - a);
           for (let m = 0; m <= x - a; m++) {
             this.createCoords(shipCoordinates, a + m, y);
           }

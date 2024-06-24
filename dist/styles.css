@@ -14,7 +14,44 @@ header {
 }
 
 #launch-screen {
+    background-color: #8D99AE;
+    color: #EF233C;
+    border: 2px solid #D90429;
+    border-radius: 10px;
+    padding: 20px;
+    font-size: 1.5rem;
+}
 
+#launch-form {
+    display: grid;
+    grid-template: 3 / 2;
+    gap: 10px;
+}
+
+#player1label {
+    grid-area: 1 / 1 / 2 / 2;
+}
+
+#player1 {
+    grid-area: 2 / 1 / 3 / 2;
+}
+
+#add-second-player {
+    grid-area: 1 / 2 / 3 / 3;
+}
+
+#player2label {
+    display: none;
+    grid-area: 1 / 2 / 2 / 3;
+}
+
+#player2 {
+    display: none;
+    grid-area: 2 / 2 / 3 / 3;
+}
+
+#submit {
+    grid-area: 3 / 1 / 4 / 3;
 }
 
 #player1-screen, #player2-screen {

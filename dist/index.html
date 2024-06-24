@@ -10,12 +10,13 @@
     <header>Battleships</header>
     <body>
     <div id="launch-screen">
-        <form>
-            <label for="player1">Player 1:</label>
+        <form id="launch-form">
+            <label for="player1" id="player1label">Player 1:</label>
             <input type="text" id="player1" name="player1" placeholder="Name">
-            <label for="player2">Player2:</label>
+            <button id="add-second-player">Add Second Player</button>
+            <label for="player2" id="player2label">Player2:</label>
             <input type="text" id="player2" name="player2" placeholder="Name">
-            <input type="submit" value="Start Battle!">
+            <input id="submit" type="submit" value="Start Battle!">
         </form>
     </div>
     <div id="player1-screen">
