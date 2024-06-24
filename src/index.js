@@ -2,6 +2,9 @@ import _ from "lodash";
 import { testgame } from "./gameboard-factory.js";
 import { testShip } from "./ship-factory.js";
 import { newGameboard, newGame } from "./gameboard-factory.js";
+import { buttonClicker } from "./DOM.js";
+
+buttonClicker();
 
 const testGameboard = newGameboard();
 testGameboard.addShip([0, 0], [1, 0]);
