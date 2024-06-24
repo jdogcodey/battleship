@@ -73,10 +73,10 @@ function newGameboard() {
   };
 }
 
-function newGame() {
+function newGame(player1, player2) {
   return {
-    player1: newGameboard(),
-    player2: newGameboard(),
+    [player1]: newGameboard(),
+    [player2]: newGameboard(),
     winner: null,
     gameOver() {
       if (this.player1.allShipsSunk) {

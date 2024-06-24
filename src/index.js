@@ -20,3 +20,6 @@ import { newGameboard, newGame } from "./gameboard-factory.js";
 // console.log(testGameboard.shipPositions);
 // console.log(testGameboard.missedAttacks);
 // console.log(testGameboard);
+
+const testGame = newGame("Player1test", "Player2test");
+console.log(testGame);
