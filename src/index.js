@@ -3,9 +3,9 @@ import { testgame } from "./gameboard-factory.js";
 import { testShip } from "./ship-factory.js";
 import { newGameboard, newGame } from "./gameboard-factory.js";
 
-// const testGameboard = newGameboard();
-// testGameboard.addShip([0, 0], [1, 0]);
-// testGameboard.addShip([1, 1], [5, 1]);
+const testGameboard = newGameboard();
+testGameboard.addShip([0, 0], [1, 0]);
+testGameboard.addShip([1, 1], [5, 1]);
 // testGameboard.receiveAttack([1, 1]);
 // testGameboard.receiveAttack([2, 1]);
 // testGameboard.receiveAttack([3, 1]);
@@ -14,12 +14,12 @@ import { newGameboard, newGame } from "./gameboard-factory.js";
 // testGameboard.receiveAttack([0, 0]);
 // testGameboard.receiveAttack([1, 0]);
 // testGameboard.receiveAttack([4, 6]);
-// console.log(testGameboard.shipPositions);
+console.log(testGameboard.shipPositions);
 
 // console.log(testGameboard.ships);
 // console.log(testGameboard.shipPositions);
 // console.log(testGameboard.missedAttacks);
 // console.log(testGameboard);
 
-const testGame = newGame("Player1test", "Player2test");
-console.log(testGame);
+// const testGame = newGame("Player1test", "Player2test");
+// console.log(testGame);

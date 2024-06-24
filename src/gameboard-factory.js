@@ -11,6 +11,7 @@ function newGameboard() {
     addShip(firstCoord, secondCoord) {
       const [a, b] = firstCoord;
       const [x, y] = secondCoord;
+      const shipCoordinates = [];
       if (
         a > 9 ||
         b > 9 ||
@@ -28,28 +29,49 @@ function newGameboard() {
         length = Math.abs(b - y) + 1;
         if (b > y) {
           for (let j = 0; j <= b - y; j++) {
-            this.shipPositions.push([a, y + j, this.shipCounter]);
+            this.createCoords(shipCoordinates, a, y + j);
           }
         } else {
           for (let k = 0; k <= y - b; k++) {
-            this.shipPositions.push([a, b + k, this.shipCounter]);
+            this.createCoords(shipCoordinates, a, b + k);
           }
         }
       } else {
         length = Math.abs(a - x) + 1;
         if (a > x) {
           for (let l = 0; l <= a - x; l++) {
-            this.shipPositions.push([x + l, y, this.shipCounter]);
+            this.createCoords(shipCoordinates, x + l, y);
           }
         } else {
           console.log(x - a);
           for (let m = 0; m <= x - a; m++) {
-            this.shipPositions.push([a + m, y, this.shipCounter]);
+            this.createCoords(shipCoordinates, a + m, y);
           }
         }
       }
+      for (let o = 0; o < shipCoordinates.length; o++) {
+        for (let p = 0; p < this.shipPositions.length; p++) {
+          if (
+            shipCoordinates[o][0] === this.shipPositions[p][0] &&
+            shipCoordinates[o][1] === this.shipPositions[p][1]
+          ) {
+            return;
+          }
+        }
+      }
+      for (let q = 0; q < shipCoordinates.length; q++) {
+        const thisShipCoords = shipCoordinates[q];
+        this.shipPositions.push([
+          thisShipCoords[0],
+          thisShipCoords[1],
+          this.shipCounter,
+        ]);
+      }
       this.ships.push(newShip(length));
       this.shipCounter++;
+    },
+    createCoords(array, firstVal, secondVal) {
+      array.push([firstVal, secondVal, this.shipCounter]);
     },
     receiveAttack(coords) {
       for (let i = 0; i < this.shipPositions.length; i++) {
