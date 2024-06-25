@@ -11,7 +11,9 @@ function newGameboard() {
     addShip(firstCoord, secondCoord) {
       const [a, b] = firstCoord;
       const [x, y] = secondCoord;
-      const shipCoordinates = [];
+      let shipCoordinates = [];
+
+      // Boundary check
       if (
         a > 9 ||
         b > 9 ||
@@ -24,49 +26,42 @@ function newGameboard() {
       ) {
         return;
       }
-      let length;
+
       if (a === x) {
-        length = Math.abs(b - y) + 1;
-        if (b > y) {
-          for (let j = 0; j <= b - y; j++) {
-            this.createCoords(shipCoordinates, a, y + j);
-          }
-        } else {
-          for (let k = 0; k <= y - b; k++) {
-            this.createCoords(shipCoordinates, a, b + k);
-          }
+        // horizontal ship
+        for (let i = Math.min(b, y); i <= Math.max(b, y); i++) {
+          shipCoordinates.push([a, i]);
+        }
+      } else if (b === y) {
+        // vertical ship
+        for (let i = Math.min(a, x); i <= Math.max(a, x); i++) {
+          shipCoordinates.push([i, b]);
         }
       } else {
-        length = Math.abs(a - x) + 1;
-        if (a > x) {
-          for (let l = 0; l <= a - x; l++) {
-            this.createCoords(shipCoordinates, x + l, y);
-          }
-        } else {
-          for (let m = 0; m <= x - a; m++) {
-            this.createCoords(shipCoordinates, a + m, y);
-          }
-        }
+        return; // Invalid ship placement
       }
-      for (let o = 0; o < shipCoordinates.length; o++) {
-        for (let p = 0; p < this.shipPositions.length; p++) {
+      // Check for overlapping ships
+      for (let i = 0; i < shipCoordinates.length; i++) {
+        for (let j = 0; j < this.shipPositions.length; j++) {
           if (
-            shipCoordinates[o][0] === this.shipPositions[p][0] &&
-            shipCoordinates[o][1] === this.shipPositions[p][1]
+            shipCoordinates[i][0] === this.shipPositions[j][0] &&
+            shipCoordinates[i][1] === this.shipPositions[j][1]
           ) {
-            return;
+            return; // Overlapping, so return without adding ship
           }
         }
       }
-      for (let q = 0; q < shipCoordinates.length; q++) {
-        const thisShipCoords = shipCoordinates[q];
-        this.shipPositions.push([
-          thisShipCoords[0],
-          thisShipCoords[1],
+
+      // Add ship coordinates
+      this.shipPositions.push(
+        ...shipCoordinates.map((coords) => [
+          coords[0],
+          coords[1],
           this.shipCounter,
-        ]);
-      }
-      this.ships.push(newShip(length));
+        ])
+      );
+
+      this.ships.push(newShip(shipCoordinates.length)); // Use shipCoordinates.length as ship length
       this.shipCounter++;
     },
     createCoords(array, firstVal, secondVal) {
@@ -80,12 +75,7 @@ function newGameboard() {
         ) {
           this.ships[this.shipPositions[i][2]].hit();
           this.shipPositions.splice(i, 1);
-          for (let n = 0; n < this.ships.length; n++) {
-            if (this.ships[n].sunk === false) return;
-            else {
-              this.allShipsSunk = true;
-            }
-          }
+          this.allShipsSunk = this.ships.every((ship) => ship.sunk);
           return;
         }
       }
@@ -100,10 +90,10 @@ function newGame(player1, player2) {
     [player2]: newGameboard(),
     winner: null,
     gameOver() {
-      if (this.player1.allShipsSunk) {
-        this.winner = this.player2;
-      } else if (this.player2.allShipsSunk) {
-        this.winner = this.player1;
+      if (this[player1].allShipsSunk) {
+        this.winner = player2;
+      } else if (this[player2].allShipsSunk) {
+        this.winner = player1;
       }
     },
   };
@@ -113,6 +103,7 @@ function computerPlacement(computerGB) {
   function generateRandom(max) {
     return Math.floor(Math.random() * max);
   }
+
   function createLowerCoords() {
     return [generateRandom(10), generateRandom(10)];
   }
@@ -142,9 +133,9 @@ function computerPlacement(computerGB) {
 
       const initialShipCount = computerGB.shipCounter;
       if (direction === 0) {
-        computerGB.addShip([a, b], [aOnTheGrid, b]);
-      } else {
         computerGB.addShip([a, b], [a, bOnTheGrid]);
+      } else {
+        computerGB.addShip([a, b], [aOnTheGrid, b]);
       }
 
       // Check if the ship was successfully added
