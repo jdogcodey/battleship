@@ -109,4 +109,54 @@ function newGame(player1, player2) {
   };
 }
 
-export { newGameboard, newGame };
+function computerPlacement(computerGB) {
+  function generateRandom(max) {
+    return Math.floor(Math.random() * max);
+  }
+  function createLowerCoords() {
+    return [generateRandom(10), generateRandom(10)];
+  }
+
+  function createShipCoords(length) {
+    let shipAdded = false;
+    while (!shipAdded) {
+      const direction = generateRandom(2);
+      const [a, b] = createLowerCoords();
+      let aOnTheGrid, bOnTheGrid;
+
+      if (direction === 0) {
+        // horizontal
+        aOnTheGrid = a;
+        bOnTheGrid = b + length - 1;
+        if (bOnTheGrid > 9) {
+          bOnTheGrid = b - length + 1;
+        }
+      } else {
+        // vertical
+        aOnTheGrid = a + length - 1;
+        bOnTheGrid = b;
+        if (aOnTheGrid > 9) {
+          aOnTheGrid = a - length + 1;
+        }
+      }
+
+      const initialShipCount = computerGB.shipCounter;
+      if (direction === 0) {
+        computerGB.addShip([a, b], [aOnTheGrid, b]);
+      } else {
+        computerGB.addShip([a, b], [a, bOnTheGrid]);
+      }
+
+      // Check if the ship was successfully added
+      if (computerGB.shipCounter > initialShipCount) {
+        shipAdded = true;
+      }
+    }
+  }
+
+  // Ship lengths as required
+  const shipLengths = [5, 4, 4, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2];
+  shipLengths.forEach((length) => createShipCoords(length));
+}
+
+export { newGameboard, newGame, computerPlacement };
