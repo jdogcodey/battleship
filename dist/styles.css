@@ -85,6 +85,22 @@ header {
     grid-area: 2 / 2 / 3 / 3;
 }
 
+.battle-button {
+    display: none;
+}
+
+.pick-table {
+    border: 2px solid #EDF2F4;
+    border-radius: 2px;
+    border-collapse: collapse;
+}
+
+.pick-table td, .pick-table th {
+    border: 1px solid #EDF2F4;
+    padding: 10px;
+    text-align: center;
+}
+
 .blank-space {
     background-color: #EDF2F4;
     border: 1px solid #8D99AE;
