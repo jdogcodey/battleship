@@ -46,124 +46,125 @@ function placementSelector(player) {
   let destroyerNumber = 3;
   let submarineNumber = 4;
   let patrolBoatNumber = 5;
-  Array.from(carrierVisual).forEach((carrier) => {
-    carrier.innerText = carrierNumber;
-  });
-  Array.from(battleshipVisual).forEach((battleship) => {
-    battleship.innerHTML = battleshipNumber;
-  });
-  Array.from(destroyerVisual).forEach((destroyer) => {
-    destroyer.innerHTML = destroyerNumber;
-  });
-  Array.from(submarineVisual).forEach((submarine) => {
-    submarine.innerHTML = submarineNumber;
-  });
-  Array.from(patrolBoatVisual).forEach((patrolBoat) => {
-    patrolBoat.innerHTML = patrolBoatNumber;
-  });
+  updateBoatNoInPage(carrierVisual, carrierNumber);
+  updateBoatNoInPage(battleshipVisual, battleshipNumber);
+  updateBoatNoInPage(destroyerVisual, destroyerNumber);
+  updateBoatNoInPage(submarineVisual, submarineNumber);
+  updateBoatNoInPage(patrolBoatVisual, patrolBoatNumber);
   Array.from(carrierElements).forEach((carrier) => {
     carrier.addEventListener("click", () => {
       if (carrierNumber > 0) {
-        placeBoat(carrierNumber, 5, player);
+        carrierNumber = placeBoat(carrierNumber, 5, player);
       }
     });
   });
   Array.from(battleshipElements).forEach((battleship) => {
     battleship.addEventListener("click", () => {
       if (battleshipNumber > 0) {
-        placeBoat(battleshipNumber, 4, player);
+        battleshipNumber = placeBoat(battleshipNumber, 4, player);
       }
     });
   });
   Array.from(destroyerElements).forEach((destroyer) => {
     destroyer.addEventListener("click", () => {
       if (destroyerNumber > 0) {
-        placeBoat(destroyerNumber, 3, player);
+        destroyerNumber = placeBoat(destroyerNumber, 3, player);
       }
     });
   });
   Array.from(submarineElements).forEach((submarine) => {
     submarine.addEventListener("click", () => {
       if (submarineNumber > 0) {
-        placeBoat(submarineNumber, 3, player);
+        submarineNumber = placeBoat(submarineNumber, 3, player);
       }
     });
   });
   Array.from(patrolBoatElements).forEach((patrolBoat) => {
     patrolBoat.addEventListener("click", () => {
       if (patrolBoatNumber > 0) {
-        placeBoat(patrolBoatNumber, 2, player);
+        patrolBoatNumber = placeBoat(patrolBoatNumber, 2, player);
       }
     });
+  });
+}
+
+function updateBoatNoInPage(boatVisual, boatNumber) {
+  Array.from(boatVisual).forEach((boat) => {
+    boat.innerText = boatNumber;
   });
 }
 
 function placeBoat(noOfBoats, length, player) {
   let initialSelection;
   let secondSelection;
+
+  // Store references to the event listeners
+  const eventListeners = {};
+
+  function clickBox(i, j, event) {
+    event.preventDefault();
+
+    // Remove all click listeners
+    for (let m = 0; m < 10; m++) {
+      for (let n = 10; n < 20; n++) {
+        const squareToRemove = document.getElementsByClassName(`${n} ${m}`);
+        Array.from(squareToRemove).forEach((square) => {
+          const listener = eventListeners[`${n}-${m}`];
+          if (listener) {
+            square.removeEventListener("click", listener);
+          }
+        });
+      }
+    }
+
+    const newj = j - 10;
+    initialSelection = [newj, i];
+    event.target.style.backgroundColor = "#EF233C";
+
+    const possibleEnd = [
+      [newj + length, i],
+      [newj - length, i],
+      [newj, i + length],
+      [newj, i - length],
+    ];
+
+    possibleEnd.forEach((coord) => {
+      if (
+        coord[0] >= 0 &&
+        coord[0] < 10 &&
+        coord[1] >= 0 &&
+        coord[1] < 10 &&
+        !player.shipPositions.some(
+          (pos) => pos[0] === coord[0] && pos[1] === coord[1]
+        )
+      ) {
+        const squareToRead = document.getElementsByClassName(
+          `${coord[0] + 10} ${coord[1]}`
+        );
+        Array.from(squareToRead).forEach((square) => {
+          square.style.backgroundColor = "#8D99AE";
+          const selectEnd = function (event) {
+            event.preventDefault();
+            secondSelection = [coord[0], coord[1]];
+            player.addShip(initialSelection, secondSelection);
+            generateBoatVisual(player.shipPositions);
+            // Remove event listeners from possible end squares
+            square.removeEventListener("click", selectEnd);
+            return noOfBoats--;
+          };
+          square.addEventListener("click", selectEnd);
+        });
+      }
+    });
+  }
+
   for (let i = 0; i < 10; i++) {
     for (let j = 10; j < 20; j++) {
       const square = document.getElementsByClassName(`${j} ${i}`);
       Array.from(square).forEach((square) => {
-        square.addEventListener("click", function clickBox(event) {
-          event.preventDefault();
-
-          // Remove all click listeners
-          for (let m = 0; m < 10; m++) {
-            for (let n = 10; n < 20; n++) {
-              const squareToRemove = document.getElementsByClassName(
-                `${n} ${m}`
-              );
-              Array.from(squareToRemove).forEach((squareToRemove) => {
-                squareToRemove.removeEventListener("click", clickBox);
-              });
-            }
-          }
-
-          const newj = j - 10;
-          initialSelection = [newj, i];
-          square.style.backgroundColor = "#EF233C";
-
-          const possibleEnd = [
-            [newj + length, i],
-            [newj - length, i],
-            [newj, i + length],
-            [newj, i - length],
-          ];
-
-          possibleEnd.forEach((coord) => {
-            if (
-              coord[0] >= 0 &&
-              coord[0] < 10 &&
-              coord[1] >= 0 &&
-              coord[1] < 10 &&
-              !player.shipPositions.some(
-                (pos) => pos[0] === coord[0] && pos[1] === coord[1]
-              )
-            ) {
-              const squareToRead = document.getElementsByClassName(
-                `${coord[0] + 10} ${coord[1]}`
-              );
-              Array.from(squareToRead).forEach((squareToRead) => {
-                squareToRead.style.backgroundColor = "#8D99AE";
-                squareToRead.addEventListener(
-                  "click",
-                  function selectEnd(event) {
-                    event.preventDefault();
-                    secondSelection = [coord[0], coord[1]];
-                    player.addShip(initialSelection, secondSelection);
-                    noOfBoats--;
-                    generateBoatVisual(player.shipPositions);
-                    // Remove event listeners from possible end squares
-                    Array.from(squareToRead).forEach((squareToRead) => {
-                      squareToRead.removeEventListener("click", selectEnd);
-                    });
-                  }
-                );
-              });
-            }
-          });
-        });
+        const listener = (event) => clickBox(i, j, event);
+        eventListeners[`${j}-${i}`] = listener;
+        square.addEventListener("click", listener, false);
       });
     }
   }
@@ -175,12 +176,16 @@ function generateBoatVisual(shipPositions) {
       const squareToClearBackground = document.getElementsByClassName(
         `${j} ${i}`
       );
-      squareToClearBackground.style.backgroundColor = "#EDF2F4";
+      Array.from(squareToClearBackground).forEach((squareToClearBackground) => {
+        squareToClearBackground.style.backgroundColor = "#EDF2F4";
+      });
     }
   }
   shipPositions.forEach(([a, b]) => {
     const squareToColour = document.getElementsByClassName(`${a + 10} ${b}`);
-    squareToColour.style.backgroundColor = "#2B2D42";
+    Array.from(squareToColour).forEach((squareToColour) => {
+      squareToColour.style.backgroundColor = "#2B2D42";
+    });
   });
 }
 
