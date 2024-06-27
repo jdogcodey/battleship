@@ -33,18 +33,6 @@ function singlePlayer(playerName) {
   const singleGame = newGame();
   const playerOne = singleGame.player1;
   singleGame.player2 = computerPlacement(singleGame.player2);
-  const playerPlacementFinished = placementSelector(playerOne);
-  const completePlacementScreen = document.getElementById("complete-placement");
-  const completePlacementButton = document.getElementById(
-    "complete-placement-button"
-  );
-  if (playerPlacementFinished) {
-    completePlacementScreen.style.display = "grid";
-    completePlacementButton.addEventListener("click", () => {});
-  }
-}
-
-function placementSelector(player) {
   const boatConfigurations = [
     { type: "carrier", count: 1, length: 5 },
     { type: "battleship", count: 2, length: 4 },
@@ -52,30 +40,24 @@ function placementSelector(player) {
     { type: "submarine", count: 4, length: 3 },
     { type: "patrol-boat", count: 5, length: 2 },
   ];
+  placementSelector(playerOne, boatConfigurations);
+}
 
+function placementSelector(player, boatConfigurations) {
   boatConfigurations.forEach((config) => {
     const boatElements = document.getElementsByClassName(config.type);
     const boatVisual = document.getElementsByClassName(`${config.type}-number`);
-    let boatCount = { count: config.count };
 
-    updateBoatNoInPage(boatVisual, boatCount.count);
+    updateBoatNoInPage(boatVisual, config.count);
     placeAndUpdateBoat(
       boatElements,
-      boatCount,
+      config,
       config.length,
       boatVisual,
-      player
+      player,
+      boatConfigurations
     );
   });
-  while (
-    boatConfigurations[0].count !== 0 &&
-    boatConfigurations[1].count !== 0 &&
-    boatConfigurations[2].count !== 0 &&
-    boatConfigurations[3].count !== 0 &&
-    boatConfigurations[4].count !== 0
-  ) {
-    return false;
-  }
 }
 
 function placeAndUpdateBoat(
@@ -83,7 +65,8 @@ function placeAndUpdateBoat(
   boatNumber,
   boatLength,
   boatVisual,
-  player
+  player,
+  boatConfigurations
 ) {
   Array.from(boatElements).forEach((boat) => {
     const clickHandler = () => {
@@ -95,12 +78,29 @@ function placeAndUpdateBoat(
           boatNumber.count--;
           console.log(`Boat placed. New count: ${boatNumber.count}`);
           updateBoatNoInPage(boatVisual, boatNumber.count);
+          checkAllBoatsPlaced(boatConfigurations);
         });
       }
     };
     boat.removeEventListener("click", clickHandler); // Ensure no duplicate listeners
     boat.addEventListener("click", clickHandler);
   });
+}
+
+function checkAllBoatsPlaced(boatConfigurations) {
+  console.log(boatConfigurations);
+  const allPlaced = boatConfigurations.every((config) => config.count === 0);
+  if (allPlaced) {
+    const completePlacementScreen =
+      document.getElementById("complete-placement");
+    const completePlacementButton = document.getElementById(
+      "complete-placement-button"
+    );
+    console.log("test");
+    completePlacementScreen.style.display = "flex";
+    completePlacementButton.innerHTML = "Battle!";
+    completePlacementButton.addEventListener("click", () => {});
+  }
 }
 
 function updateBoatNoInPage(boatVisual, boatNumber) {
