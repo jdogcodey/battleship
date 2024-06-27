@@ -51,41 +51,35 @@ function placementSelector(player) {
   updateBoatNoInPage(destroyerVisual, destroyerNumber);
   updateBoatNoInPage(submarineVisual, submarineNumber);
   updateBoatNoInPage(patrolBoatVisual, patrolBoatNumber);
-  Array.from(carrierElements).forEach((carrier) => {
-    carrier.addEventListener("click", () => {
-      if (carrierNumber > 0) {
-        carrierNumber = placeBoat(carrierNumber, 5, player);
-      }
-    });
-  });
-  Array.from(battleshipElements).forEach((battleship) => {
-    battleship.addEventListener("click", () => {
-      if (battleshipNumber > 0) {
-        battleshipNumber = placeBoat(battleshipNumber, 4, player);
-      }
-    });
-  });
-  Array.from(destroyerElements).forEach((destroyer) => {
-    destroyer.addEventListener("click", () => {
-      if (destroyerNumber > 0) {
-        destroyerNumber = placeBoat(destroyerNumber, 3, player);
-      }
-    });
-  });
-  Array.from(submarineElements).forEach((submarine) => {
-    submarine.addEventListener("click", () => {
-      if (submarineNumber > 0) {
-        submarineNumber = placeBoat(submarineNumber, 3, player);
-      }
-    });
-  });
-  Array.from(patrolBoatElements).forEach((patrolBoat) => {
-    patrolBoat.addEventListener("click", () => {
-      if (patrolBoatNumber > 0) {
-        patrolBoatNumber = placeBoat(patrolBoatNumber, 2, player);
-      }
-    });
-  });
+  placeAndUpdateBoat(carrierElements, carrierNumber, 5, carrierVisual, player);
+  placeAndUpdateBoat(
+    battleshipElements,
+    battleshipNumber,
+    4,
+    battleshipVisual,
+    player
+  );
+  placeAndUpdateBoat(
+    destroyerElements,
+    destroyerNumber,
+    3,
+    destroyerVisual,
+    player
+  );
+  placeAndUpdateBoat(
+    submarineElements,
+    submarineNumber,
+    3,
+    submarineVisual,
+    player
+  );
+  placeAndUpdateBoat(
+    patrolBoatElements,
+    patrolBoatNumber,
+    2,
+    patrolBoatVisual,
+    player
+  );
 }
 
 function updateBoatNoInPage(boatVisual, boatNumber) {
@@ -94,7 +88,26 @@ function updateBoatNoInPage(boatVisual, boatNumber) {
   });
 }
 
-function placeBoat(noOfBoats, length, player) {
+function placeAndUpdateBoat(
+  boatElements,
+  boatNumber,
+  boatLength,
+  boatVisual,
+  player
+) {
+  Array.from(boatElements).forEach((boat) => {
+    boat.addEventListener("click", () => {
+      if (boatNumber > 0) {
+        placeBoat(boatNumber, boatLength, player, () => {
+          boatNumber--;
+          updateBoatNoInPage(boatVisual, boatNumber);
+        });
+      }
+    });
+  });
+}
+
+function placeBoat(noOfBoats, length, player, updateBoatNumber) {
   let initialSelection;
   let secondSelection;
 
@@ -150,7 +163,7 @@ function placeBoat(noOfBoats, length, player) {
             generateBoatVisual(player.shipPositions);
             // Remove event listeners from possible end squares
             square.removeEventListener("click", selectEnd);
-            return noOfBoats--;
+            updateBoatNumber();
           };
           square.addEventListener("click", selectEnd);
         });
