@@ -13,7 +13,11 @@ header {
     margin: 20px;
 }
 
-#launch-screen, #player1-placement, #player2-placement {
+#placement-screen, #switch-team-screen, #play-screen, #player2 {
+    display: none;
+}
+
+#launch-screen, #placement-screen {
     background-color: #8D99AE;
     color: #2B2D42;
     border: 2px solid #D90429;
@@ -51,7 +55,6 @@ header {
 }
 
 #player2 {
-    display: none;
     grid-area: 2 / 2 / 3 / 3;
     width: 200px;
 }
@@ -63,13 +66,12 @@ header {
     border-radius: 5px;
 }
 
-#player1-placement, #player2-placement, #player1-screen, #player2-screen {
-    display: none;
+#placement-screen, #play-screen {
     grid-template: 2 / 2;
     gap: 20px;
 }
 
-.screen-title {
+#screen-title {
     grid-area: 1 / 1 / 2 / 3;
     font-size: 2rem;
     text-align: center;

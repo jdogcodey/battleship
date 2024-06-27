@@ -11,22 +11,37 @@ function buttonClicker() {
   const startBattle = document.getElementById("submit");
   const launchScreen = document.getElementById("launch-screen");
   const player2Name = document.getElementById("player2");
+  const player1Name = document.getElementById("player1");
   startBattle.addEventListener("click", () => {
     event.preventDefault();
-    launchScreen.style.display = "none";
-    if (player2Name.value !== null) {
-      singlePlayer();
-    } else twoPlayerPlacement();
+    if (player1Name.value.trim() === "") {
+      alert("Please input a name to battle!");
+    } else {
+      launchScreen.style.display = "none";
+      if (player2Name.value.trim() === "") {
+        singlePlayer(player1Name.value);
+      } else twoPlayerPlacement(player1Name.value, player2Name.value);
+    }
   });
 }
 
-function singlePlayer() {
-  const playerPlacementScreen = document.getElementById("player1-placement");
+function singlePlayer(playerName) {
+  const playerPlacementScreen = document.getElementById("placement-screen");
+  const title = document.getElementById("screen-title");
+  title.innerHTML = `${playerName} - Place Your Ships!`;
   playerPlacementScreen.style.display = "grid";
   const singleGame = newGame();
   const playerOne = singleGame.player1;
   singleGame.player2 = computerPlacement(singleGame.player2);
-  placementSelector(playerOne);
+  const playerPlacementFinished = placementSelector(playerOne);
+  const completePlacementScreen = document.getElementById("complete-placement");
+  const completePlacementButton = document.getElementById(
+    "complete-placement-button"
+  );
+  if (playerPlacementFinished) {
+    completePlacementScreen.style.display = "grid";
+    completePlacementButton.addEventListener("click", () => {});
+  }
 }
 
 function placementSelector(player) {
@@ -52,6 +67,15 @@ function placementSelector(player) {
       player
     );
   });
+  while (
+    boatConfigurations[0].count !== 0 &&
+    boatConfigurations[1].count !== 0 &&
+    boatConfigurations[2].count !== 0 &&
+    boatConfigurations[3].count !== 0 &&
+    boatConfigurations[4].count !== 0
+  ) {
+    return false;
+  }
 }
 
 function placeAndUpdateBoat(
