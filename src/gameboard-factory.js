@@ -63,6 +63,7 @@ function newGameboard() {
 
       this.ships.push(newShip(shipCoordinates.length)); // Use shipCoordinates.length as ship length
       this.shipCounter++;
+      return true;
     },
     createCoords(array, firstVal, secondVal) {
       array.push([firstVal, secondVal, this.shipCounter]);

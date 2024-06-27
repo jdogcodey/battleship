@@ -30,61 +30,27 @@ function singlePlayer() {
 }
 
 function placementSelector(player) {
-  const carrierElements = document.getElementsByClassName("carrier");
-  const battleshipElements = document.getElementsByClassName("battleship");
-  const destroyerElements = document.getElementsByClassName("destroyer");
-  const submarineElements = document.getElementsByClassName("submarine");
-  const patrolBoatElements = document.getElementsByClassName("patrol-boat");
-  const carrierVisual = document.getElementsByClassName("carrier-number");
-  const battleshipVisual = document.getElementsByClassName("battleship-number");
-  const destroyerVisual = document.getElementsByClassName("destroyer-number");
-  const submarineVisual = document.getElementsByClassName("submarine-number");
-  const patrolBoatVisual =
-    document.getElementsByClassName("patrol-boat-number");
-  let carrierNumber = 1;
-  let battleshipNumber = 2;
-  let destroyerNumber = 3;
-  let submarineNumber = 4;
-  let patrolBoatNumber = 5;
-  updateBoatNoInPage(carrierVisual, carrierNumber);
-  updateBoatNoInPage(battleshipVisual, battleshipNumber);
-  updateBoatNoInPage(destroyerVisual, destroyerNumber);
-  updateBoatNoInPage(submarineVisual, submarineNumber);
-  updateBoatNoInPage(patrolBoatVisual, patrolBoatNumber);
-  placeAndUpdateBoat(carrierElements, carrierNumber, 5, carrierVisual, player);
-  placeAndUpdateBoat(
-    battleshipElements,
-    battleshipNumber,
-    4,
-    battleshipVisual,
-    player
-  );
-  placeAndUpdateBoat(
-    destroyerElements,
-    destroyerNumber,
-    3,
-    destroyerVisual,
-    player
-  );
-  placeAndUpdateBoat(
-    submarineElements,
-    submarineNumber,
-    3,
-    submarineVisual,
-    player
-  );
-  placeAndUpdateBoat(
-    patrolBoatElements,
-    patrolBoatNumber,
-    2,
-    patrolBoatVisual,
-    player
-  );
-}
+  const boatConfigurations = [
+    { type: "carrier", count: 1, length: 5 },
+    { type: "battleship", count: 2, length: 4 },
+    { type: "destroyer", count: 3, length: 3 },
+    { type: "submarine", count: 4, length: 3 },
+    { type: "patrol-boat", count: 5, length: 2 },
+  ];
 
-function updateBoatNoInPage(boatVisual, boatNumber) {
-  Array.from(boatVisual).forEach((boat) => {
-    boat.innerText = boatNumber;
+  boatConfigurations.forEach((config) => {
+    const boatElements = document.getElementsByClassName(config.type);
+    const boatVisual = document.getElementsByClassName(`${config.type}-number`);
+    let boatCount = { count: config.count };
+
+    updateBoatNoInPage(boatVisual, boatCount.count);
+    placeAndUpdateBoat(
+      boatElements,
+      boatCount,
+      config.length,
+      boatVisual,
+      player
+    );
   });
 }
 
@@ -96,18 +62,31 @@ function placeAndUpdateBoat(
   player
 ) {
   Array.from(boatElements).forEach((boat) => {
-    boat.addEventListener("click", () => {
-      if (boatNumber > 0) {
-        placeBoat(boatNumber, boatLength, player, () => {
-          boatNumber--;
-          updateBoatNoInPage(boatVisual, boatNumber);
+    const clickHandler = () => {
+      if (boatNumber.count > 0) {
+        console.log(
+          `Placing boat of length ${boatLength}. Current count: ${boatNumber.count}`
+        );
+        placeBoat(boatLength, player, () => {
+          boatNumber.count--;
+          console.log(`Boat placed. New count: ${boatNumber.count}`);
+          updateBoatNoInPage(boatVisual, boatNumber.count);
         });
       }
-    });
+    };
+    boat.removeEventListener("click", clickHandler); // Ensure no duplicate listeners
+    boat.addEventListener("click", clickHandler);
   });
 }
 
-function placeBoat(noOfBoats, length, player, updateBoatNumber) {
+function updateBoatNoInPage(boatVisual, boatNumber) {
+  Array.from(boatVisual).forEach((boat) => {
+    boat.innerText = boatNumber;
+    console.log(`Updated boat number display to: ${boatNumber}`);
+  });
+}
+
+function placeBoat(length, player, updateBoatNumber) {
   let initialSelection;
   let secondSelection;
 
@@ -135,10 +114,10 @@ function placeBoat(noOfBoats, length, player, updateBoatNumber) {
     event.target.style.backgroundColor = "#EF233C";
 
     const possibleEnd = [
-      [newj + length, i],
-      [newj - length, i],
-      [newj, i + length],
-      [newj, i - length],
+      [newj + length - 1, i],
+      [newj - length + 1, i],
+      [newj, i + length - 1],
+      [newj, i - length + 1],
     ];
 
     possibleEnd.forEach((coord) => {
@@ -159,11 +138,13 @@ function placeBoat(noOfBoats, length, player, updateBoatNumber) {
           const selectEnd = function (event) {
             event.preventDefault();
             secondSelection = [coord[0], coord[1]];
-            player.addShip(initialSelection, secondSelection);
-            generateBoatVisual(player.shipPositions);
-            // Remove event listeners from possible end squares
-            square.removeEventListener("click", selectEnd);
-            updateBoatNumber();
+            const success = player.addShip(initialSelection, secondSelection);
+            if (success) {
+              generateBoatVisual(player.shipPositions);
+              // Remove event listeners from possible end squares
+              square.removeEventListener("click", selectEnd);
+              updateBoatNumber();
+            }
           };
           square.addEventListener("click", selectEnd);
         });
