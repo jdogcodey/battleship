@@ -1,21 +1,24 @@
 import { newGame, computerPlacement } from "./gameboard-factory";
 
-// Function that checks if the second player and start battle buttons have been pressed
+// Function that sets up event listeners for the second player and start battle buttons
 function buttonClicker() {
   const secondPlayer = document.getElementById("add-second-player");
   const inputSecondPlayer = document.getElementById("player2");
-  // If the add second player has been added then show the box to input a second player name
-  secondPlayer.addEventListener("click", () => {
+
+  // If the add second player button is clicked, show the input field for the second player's name
+  secondPlayer.addEventListener("click", (event) => {
     event.preventDefault();
     secondPlayer.style.display = "none";
     inputSecondPlayer.style.display = "inline-block";
   });
+
   const startBattle = document.getElementById("submit");
   const launchScreen = document.getElementById("launch-screen");
   const player2Name = document.getElementById("player2");
   const player1Name = document.getElementById("player1");
-  // When start battle has been pressed - if no name input then alert that a name is needed
-  startBattle.addEventListener("click", () => {
+
+  // When the start battle button is clicked, check if the player names are provided and proceed accordingly
+  startBattle.addEventListener("click", (event) => {
     event.preventDefault();
     if (player1Name.value.trim() === "") {
       alert("Please input a name to battle!");
@@ -23,23 +26,29 @@ function buttonClicker() {
       launchScreen.style.display = "none";
       if (player2Name.value.trim() === "") {
         singlePlayer(player1Name.value);
-      } else twoPlayerPlacement(player1Name.value, player2Name.value);
+      } else {
+        twoPlayerPlacement(player1Name.value, player2Name.value);
+      }
     }
   });
 }
 
+// Function to start a single-player game
 function singlePlayer(playerName) {
-  const singleGame = newGame();
+  const singleGame = newGame(); // Create a new game instance
   const playerOne = singleGame.player1;
-  singleGame.player2 = computerPlacement(singleGame.player2);
-  boatPlacement(playerOne, playerName);
+  singleGame.player2 = computerPlacement(singleGame.player2); // Set up computer as the second player
+  boatPlacement(playerOne, playerName); // Start the boat placement phase
 }
 
+// Function to handle the boat placement phase for a player
 function boatPlacement(player, playerName) {
   const playerPlacementScreen = document.getElementById("placement-screen");
   const title = document.getElementById("screen-title");
   title.innerHTML = `${playerName} - Place Your Ships!`;
   playerPlacementScreen.style.display = "grid";
+
+  // Define the configurations for each type of boat
   const boatConfigurations = [
     { type: "carrier", count: 1, length: 5 },
     { type: "battleship", count: 2, length: 4 },
@@ -47,15 +56,17 @@ function boatPlacement(player, playerName) {
     { type: "submarine", count: 4, length: 3 },
     { type: "patrol-boat", count: 5, length: 2 },
   ];
-  placementSelector(player, boatConfigurations);
+
+  placementSelector(player, boatConfigurations); // Start the placement selector
 }
 
+// Function to initialize the placement selector for each type of boat
 function placementSelector(player, boatConfigurations) {
   boatConfigurations.forEach((config) => {
     const boatElements = document.getElementsByClassName(config.type);
     const boatVisual = document.getElementsByClassName(`${config.type}-number`);
 
-    updateBoatNoInPage(boatVisual, config.count);
+    updateBoatNoInPage(boatVisual, config.count); // Update the UI with the number of boats
     placeAndUpdateBoat(
       boatElements,
       config,
@@ -63,10 +74,11 @@ function placementSelector(player, boatConfigurations) {
       boatVisual,
       player,
       boatConfigurations
-    );
+    ); // Set up the event listeners for boat placement
   });
 }
 
+// Function to handle the placement and updating of boats
 function placeAndUpdateBoat(
   boatElements,
   boatNumber,
@@ -78,24 +90,20 @@ function placeAndUpdateBoat(
   Array.from(boatElements).forEach((boat) => {
     const clickHandler = () => {
       if (boatNumber.count > 0) {
-        console.log(
-          `Placing boat of length ${boatLength}. Current count: ${boatNumber.count}`
-        );
         placeBoat(boatLength, player, () => {
           boatNumber.count--;
-          console.log(`Boat placed. New count: ${boatNumber.count}`);
-          updateBoatNoInPage(boatVisual, boatNumber.count);
-          checkAllBoatsPlaced(boatConfigurations);
+          updateBoatNoInPage(boatVisual, boatNumber.count); // Update the UI with the new count
+          checkAllBoatsPlaced(boatConfigurations); // Check if all boats have been placed
         });
       }
     };
     boat.removeEventListener("click", clickHandler); // Ensure no duplicate listeners
-    boat.addEventListener("click", clickHandler);
+    boat.addEventListener("click", clickHandler, false); // Add click listener for placing boats
   });
 }
 
+// Function to check if all boats have been placed
 function checkAllBoatsPlaced(boatConfigurations) {
-  console.log(boatConfigurations);
   const allPlaced = boatConfigurations.every((config) => config.count === 0);
   if (allPlaced) {
     const completePlacementScreen =
@@ -103,20 +111,20 @@ function checkAllBoatsPlaced(boatConfigurations) {
     const completePlacementButton = document.getElementById(
       "complete-placement-button"
     );
-    console.log("test");
     completePlacementScreen.style.display = "flex";
     completePlacementButton.innerHTML = "Battle!";
     completePlacementButton.addEventListener("click", () => {});
   }
 }
 
+// Function to update the UI with the number of remaining boats
 function updateBoatNoInPage(boatVisual, boatNumber) {
   Array.from(boatVisual).forEach((boat) => {
     boat.innerText = boatNumber;
-    console.log(`Updated boat number display to: ${boatNumber}`);
   });
 }
 
+// Function to handle the placement of a boat on the board
 function placeBoat(length, player, updateBoatNumber) {
   let initialSelection;
   let secondSelection;
@@ -151,35 +159,55 @@ function placeBoat(length, player, updateBoatNumber) {
       [newj, i - length + 1],
     ];
 
-    possibleEnd.forEach((coord) => {
-      if (
-        coord[0] >= 0 &&
-        coord[0] < 10 &&
-        coord[1] >= 0 &&
-        coord[1] < 10 &&
-        !player.shipPositions.some(
-          (pos) => pos[0] === coord[0] && pos[1] === coord[1]
+    // Remove invalid end positions that overlap existing ships
+    const validEnds = possibleEnd.filter((coord) => {
+      const xRange = [
+        ...Array(Math.abs(coord[0] - initialSelection[0]) + 1).keys(),
+      ].map((x) => Math.min(coord[0], initialSelection[0]) + x);
+      const yRange = [
+        ...Array(Math.abs(coord[1] - initialSelection[1]) + 1).keys(),
+      ].map((y) => Math.min(coord[1], initialSelection[1]) + y);
+
+      const isValid = xRange.every((x) =>
+        yRange.every(
+          (y) =>
+            x >= 0 &&
+            x < 10 &&
+            y >= 0 &&
+            y < 10 &&
+            !player.shipPositions.some((pos) => pos[0] === x && pos[1] === y)
         )
-      ) {
-        const squareToRead = document.getElementsByClassName(
-          `${coord[0] + 10} ${coord[1]}`
-        );
-        Array.from(squareToRead).forEach((square) => {
-          square.style.backgroundColor = "#8D99AE";
-          const selectEnd = function (event) {
-            event.preventDefault();
-            secondSelection = [coord[0], coord[1]];
-            const success = player.addShip(initialSelection, secondSelection);
-            if (success) {
-              generateBoatVisual(player.shipPositions);
-              // Remove event listeners from possible end squares
-              square.removeEventListener("click", selectEnd);
-              updateBoatNumber();
-            }
-          };
-          square.addEventListener("click", selectEnd);
-        });
-      }
+      );
+
+      return isValid;
+    });
+
+    if (validEnds.length === 0) {
+      alert(
+        "No valid placement from this starting point. Please select a different starting point."
+      );
+      event.target.style.backgroundColor = ""; // Reset the initial selection color
+      return; // Exit without decrementing boat count or updating UI
+    }
+
+    validEnds.forEach((coord) => {
+      const squareToRead = document.getElementsByClassName(
+        `${coord[0] + 10} ${coord[1]}`
+      );
+      Array.from(squareToRead).forEach((square) => {
+        square.style.backgroundColor = "#8D99AE"; // Highlight valid end positions
+        const selectEnd = function (event) {
+          event.preventDefault();
+          secondSelection = [coord[0], coord[1]];
+          const success = player.addShip(initialSelection, secondSelection);
+          if (success) {
+            generateBoatVisual(player.shipPositions); // Visualize the placed boats
+            square.removeEventListener("click", selectEnd);
+            updateBoatNumber(); // Update the number of remaining boats
+          }
+        };
+        square.addEventListener("click", selectEnd); // Add click listener for selecting end position
+      });
     });
   }
 
@@ -195,6 +223,7 @@ function placeBoat(length, player, updateBoatNumber) {
   }
 }
 
+// Function to visualize the placed boats on the board
 function generateBoatVisual(shipPositions) {
   for (let i = 0; i < 10; i++) {
     for (let j = 10; j < 20; j++) {
