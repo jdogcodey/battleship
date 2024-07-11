@@ -27,7 +27,7 @@ function buttonClicker() {
       if (player2Name.value.trim() === "") {
         singlePlayer(player1Name.value);
       } else {
-        twoPlayerPlacement(player1Name.value, player2Name.value);
+        twoPlayer(player1Name.value, player2Name.value);
       }
     }
   });
@@ -41,8 +41,22 @@ function singlePlayer(playerName) {
   boatPlacement(playerOne, playerName); // Start the boat placement phase
 }
 
+// Function to start a two-player game
+function twoPlayer(player1Name, player2Name) {
+  const twoPlayerGame = newGame();
+  const playerOne = twoPlayerGame.player1;
+  const playerTwo = twoPlayerGame.player2;
+  boatPlacement(playerOne, player1Name, () => {
+    const squares = document.getElementsByClassName("blank-space");
+    Array.from(squares).forEach((square) => {
+      square.style.backgroundColor = "#EDF2F4";
+    });
+    boatPlacement(playerTwo, player2Name);
+  });
+}
+
 // Function to handle the boat placement phase for a player
-function boatPlacement(player, playerName) {
+function boatPlacement(player, playerName, callback) {
   const playerPlacementScreen = document.getElementById("placement-screen");
   const title = document.getElementById("screen-title");
   title.innerHTML = `${playerName} - Place Your Ships!`;
@@ -57,11 +71,11 @@ function boatPlacement(player, playerName) {
     { type: "patrol-boat", count: 5, length: 2 },
   ];
 
-  placementSelector(player, boatConfigurations); // Start the placement selector
+  placementSelector(player, boatConfigurations, callback); // Start the placement selector
 }
 
 // Function to initialize the placement selector for each type of boat
-function placementSelector(player, boatConfigurations) {
+function placementSelector(player, boatConfigurations, callback) {
   boatConfigurations.forEach((config) => {
     const boatElements = document.getElementsByClassName(config.type);
     const boatVisual = document.getElementsByClassName(`${config.type}-number`);
@@ -73,7 +87,8 @@ function placementSelector(player, boatConfigurations) {
       config.length,
       boatVisual,
       player,
-      boatConfigurations
+      boatConfigurations,
+      callback
     ); // Set up the event listeners for boat placement
   });
 }
@@ -85,7 +100,8 @@ function placeAndUpdateBoat(
   boatLength,
   boatVisual,
   player,
-  boatConfigurations
+  boatConfigurations,
+  callback
 ) {
   Array.from(boatElements).forEach((boat) => {
     const clickHandler = () => {
@@ -93,7 +109,7 @@ function placeAndUpdateBoat(
         placeBoat(boatLength, player, () => {
           boatNumber.count--;
           updateBoatNoInPage(boatVisual, boatNumber.count); // Update the UI with the new count
-          checkAllBoatsPlaced(boatConfigurations); // Check if all boats have been placed
+          if (checkAllBoatsPlaced(boatConfigurations)) callback(); // Call the callback if all boats have been placed
         });
       }
     };
@@ -104,17 +120,7 @@ function placeAndUpdateBoat(
 
 // Function to check if all boats have been placed
 function checkAllBoatsPlaced(boatConfigurations) {
-  const allPlaced = boatConfigurations.every((config) => config.count === 0);
-  if (allPlaced) {
-    const completePlacementScreen =
-      document.getElementById("complete-placement");
-    const completePlacementButton = document.getElementById(
-      "complete-placement-button"
-    );
-    completePlacementScreen.style.display = "flex";
-    completePlacementButton.innerHTML = "Battle!";
-    completePlacementButton.addEventListener("click", () => {});
-  }
+  return boatConfigurations.every((config) => config.count === 0);
 }
 
 // Function to update the UI with the number of remaining boats
