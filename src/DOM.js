@@ -1,8 +1,10 @@
 import { newGame, computerPlacement } from "./gameboard-factory";
 
+// Function that checks if the second player and start battle buttons have been pressed
 function buttonClicker() {
   const secondPlayer = document.getElementById("add-second-player");
   const inputSecondPlayer = document.getElementById("player2");
+  // If the add second player has been added then show the box to input a second player name
   secondPlayer.addEventListener("click", () => {
     event.preventDefault();
     secondPlayer.style.display = "none";
@@ -12,6 +14,7 @@ function buttonClicker() {
   const launchScreen = document.getElementById("launch-screen");
   const player2Name = document.getElementById("player2");
   const player1Name = document.getElementById("player1");
+  // When start battle has been pressed - if no name input then alert that a name is needed
   startBattle.addEventListener("click", () => {
     event.preventDefault();
     if (player1Name.value.trim() === "") {
@@ -26,13 +29,17 @@ function buttonClicker() {
 }
 
 function singlePlayer(playerName) {
+  const singleGame = newGame();
+  const playerOne = singleGame.player1;
+  singleGame.player2 = computerPlacement(singleGame.player2);
+  boatPlacement(playerOne, playerName);
+}
+
+function boatPlacement(player, playerName) {
   const playerPlacementScreen = document.getElementById("placement-screen");
   const title = document.getElementById("screen-title");
   title.innerHTML = `${playerName} - Place Your Ships!`;
   playerPlacementScreen.style.display = "grid";
-  const singleGame = newGame();
-  const playerOne = singleGame.player1;
-  singleGame.player2 = computerPlacement(singleGame.player2);
   const boatConfigurations = [
     { type: "carrier", count: 1, length: 5 },
     { type: "battleship", count: 2, length: 4 },
@@ -40,7 +47,7 @@ function singlePlayer(playerName) {
     { type: "submarine", count: 4, length: 3 },
     { type: "patrol-boat", count: 5, length: 2 },
   ];
-  placementSelector(playerOne, boatConfigurations);
+  placementSelector(player, boatConfigurations);
 }
 
 function placementSelector(player, boatConfigurations) {
