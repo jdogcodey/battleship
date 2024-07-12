@@ -65,7 +65,15 @@ function twoPlayer(player1Name, player2Name) {
     placementScreen.style.display = "none";
     const switchTeamScreen = document.getElementById("switch-team-screen");
     switchTeamScreen.style.display = "grid";
-    boatPlacement(playerTwo, player2Name);
+    const switchTeamTitle = document.getElementById("switch-team-title");
+    switchTeamTitle.innerHTML = `Pass to ${player2Name} to place Ships!`;
+    const switchTeamButton = document.getElementById("switch-button");
+    switchTeamButton.innerHTML = `${player2Name} ready`;
+    switchTeamButton.addEventListener("click", () => {
+      placementScreen.style.display = "grid";
+      switchTeamScreen.style.display = "none";
+      boatPlacement(playerTwo, player2Name);
+    });
   });
 }
 

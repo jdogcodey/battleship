@@ -116,6 +116,18 @@ header {
 }
 
 #switch-team-screen {
-    grid-template: 2 / 3;
-    
+    grid-template: 2 / 1;
+}
+
+#switch-team-title {
+    grid-row: 1 / 2;
+    font-size: 2rem;
+    text-align: center;
+}
+
+#switch-button {
+    grid-row: 2 / 3;
+    color: #D90429;
+    border: 1px solid #D90249;
+    border-radius: 5px;
 }
