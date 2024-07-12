@@ -17,7 +17,7 @@ header {
     display: none;
 }
 
-#launch-screen, #placement-screen {
+#launch-screen, #placement-screen, #switch-team-screen {
     background-color: #8D99AE;
     color: #2B2D42;
     border: 2px solid #D90429;
@@ -115,3 +115,7 @@ header {
     font-size: 2rem;
 }
 
+#switch-team-screen {
+    grid-template: 2 / 3;
+    
+}

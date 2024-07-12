@@ -38,7 +38,17 @@ function singlePlayer(playerName) {
   const singleGame = newGame(); // Create a new game instance
   const playerOne = singleGame.player1;
   singleGame.player2 = computerPlacement(singleGame.player2); // Set up computer as the second player
-  boatPlacement(playerOne, playerName); // Start the boat placement phase
+  boatPlacement(playerOne, playerName, () => {
+    // Start the boat placement phase
+    const completePlacementScreen =
+      document.getElementById("complete-placement");
+    const completePlacementButton = document.getElementById(
+      "complete-placement-button"
+    );
+    completePlacementScreen.style.display = "grid";
+    completePlacementButton.innerHTML = "Battle!";
+    completePlacementButton.addEventListener("click", () => {});
+  });
 }
 
 // Function to start a two-player game
@@ -51,6 +61,10 @@ function twoPlayer(player1Name, player2Name) {
     Array.from(squares).forEach((square) => {
       square.style.backgroundColor = "#EDF2F4";
     });
+    const placementScreen = document.getElementById("placement-screen");
+    placementScreen.style.display = "none";
+    const switchTeamScreen = document.getElementById("switch-team-screen");
+    switchTeamScreen.style.display = "grid";
     boatPlacement(playerTwo, player2Name);
   });
 }
