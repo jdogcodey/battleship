@@ -47,7 +47,12 @@ function singlePlayer(playerName) {
     );
     completePlacementScreen.style.display = "grid";
     completePlacementButton.innerHTML = "Battle!";
-    completePlacementButton.addEventListener("click", () => {});
+    completePlacementButton.addEventListener("click", () => {
+      const placementScreen = document.getElementById("placement-screen");
+      placementScreen.style.display = "none";
+      const playScreen = document.getElementById("play-screen");
+      playScreen.style.display = "grid";
+    });
   });
 }
 
@@ -101,8 +106,10 @@ function switchPlayer(previousScreen, switchTitle, switchMessage, buttonFunc) {
 // Function to handle the boat placement phase for a player
 function boatPlacement(player, playerName, callback) {
   const playerPlacementScreen = document.getElementById("placement-screen");
-  const title = document.getElementById("screen-title");
-  title.innerHTML = `${playerName} - Place Your Ships!`;
+  const title = document.getElementsByClassName("screen-title");
+  Array.from(title).forEach((title) => {
+    title.innerHTML = `${playerName} - Place Your Ships!`;
+  });
   playerPlacementScreen.style.display = "grid";
 
   // Define the configurations for each type of boat
