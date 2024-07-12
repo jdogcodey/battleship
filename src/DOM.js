@@ -74,7 +74,10 @@ function twoPlayer(player1Name, player2Name) {
           switchPlayer(
             "placement-screen",
             `Pass to ${player1Name} to Battle!`,
-            `${player1Name} ready`
+            `${player1Name} ready`,
+            () => {
+              console.log(twoPlayerGame);
+            }
           );
         });
       }
@@ -184,7 +187,9 @@ function placeBoat(length, player, updateBoatNumber) {
     // Remove all click listeners
     for (let m = 0; m < 10; m++) {
       for (let n = 10; n < 20; n++) {
-        const squareToRemove = document.getElementsByClassName(`${n} ${m}`);
+        const squareToRemove = document.getElementsByClassName(
+          `blank-space ${n} ${m}`
+        );
         Array.from(squareToRemove).forEach((square) => {
           const listener = eventListeners[`${n}-${m}`];
           if (listener) {
@@ -238,7 +243,7 @@ function placeBoat(length, player, updateBoatNumber) {
 
     validEnds.forEach((coord) => {
       const squareToRead = document.getElementsByClassName(
-        `${coord[0] + 10} ${coord[1]}`
+        `blank-space ${coord[0] + 10} ${coord[1]}`
       );
       Array.from(squareToRead).forEach((square) => {
         square.style.backgroundColor = "#8D99AE"; // Highlight valid end positions
@@ -259,7 +264,7 @@ function placeBoat(length, player, updateBoatNumber) {
 
   for (let i = 0; i < 10; i++) {
     for (let j = 10; j < 20; j++) {
-      const square = document.getElementsByClassName(`${j} ${i}`);
+      const square = document.getElementsByClassName(`blank-space ${j} ${i}`);
       Array.from(square).forEach((square) => {
         const listener = (event) => clickBox(i, j, event);
         eventListeners[`${j}-${i}`] = listener;
@@ -274,7 +279,7 @@ function generateBoatVisual(shipPositions) {
   for (let i = 0; i < 10; i++) {
     for (let j = 10; j < 20; j++) {
       const squareToClearBackground = document.getElementsByClassName(
-        `${j} ${i}`
+        `blank-space ${j} ${i}`
       );
       Array.from(squareToClearBackground).forEach((squareToClearBackground) => {
         squareToClearBackground.style.backgroundColor = "#EDF2F4";
@@ -282,7 +287,9 @@ function generateBoatVisual(shipPositions) {
     }
   }
   shipPositions.forEach(([a, b]) => {
-    const squareToColour = document.getElementsByClassName(`${a + 10} ${b}`);
+    const squareToColour = document.getElementsByClassName(
+      `blank-space ${a + 10} ${b}`
+    );
     Array.from(squareToColour).forEach((squareToColour) => {
       squareToColour.style.backgroundColor = "#2B2D42";
     });
