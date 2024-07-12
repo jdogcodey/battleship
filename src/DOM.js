@@ -48,10 +48,7 @@ function singlePlayer(playerName) {
     completePlacementScreen.style.display = "grid";
     completePlacementButton.innerHTML = "Battle!";
     completePlacementButton.addEventListener("click", () => {
-      const placementScreen = document.getElementById("placement-screen");
-      placementScreen.style.display = "none";
-      const playScreen = document.getElementById("play-screen");
-      playScreen.style.display = "grid";
+      launchBattle("Select where to Strike!", () => {});
     });
   });
 }
@@ -81,13 +78,28 @@ function twoPlayer(player1Name, player2Name) {
             `Pass to ${player1Name} to Battle!`,
             `${player1Name} ready`,
             () => {
-              console.log(twoPlayerGame);
+              launchBattle(
+                `${player1Name} - Select where to Strike!`,
+                () => {}
+              );
             }
           );
         });
       }
     );
   });
+}
+
+function launchBattle(title, func) {
+  const placementScreen = document.getElementById("placement-screen");
+  placementScreen.style.display = "none";
+  const playScreen = document.getElementById("play-screen");
+  playScreen.style.display = "grid";
+  const screenTitle = document.getElementsByClassName("screen-title");
+  Array.from(screenTitle).forEach((screenTitle) => {
+    screenTitle.innerHTML = title;
+  });
+  func();
 }
 
 // Function for the switch player screen
