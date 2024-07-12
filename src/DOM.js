@@ -61,20 +61,38 @@ function twoPlayer(player1Name, player2Name) {
     Array.from(squares).forEach((square) => {
       square.style.backgroundColor = "#EDF2F4";
     });
-    const placementScreen = document.getElementById("placement-screen");
-    placementScreen.style.display = "none";
-    const switchTeamScreen = document.getElementById("switch-team-screen");
-    switchTeamScreen.style.display = "grid";
-    const switchTeamTitle = document.getElementById("switch-team-title");
-    switchTeamTitle.innerHTML = `Pass to ${player2Name} to place Ships!`;
-    const switchTeamButton = document.getElementById("switch-button");
-    switchTeamButton.innerHTML = `${player2Name} ready`;
-    switchTeamButton.addEventListener("click", () => {
-      placementScreen.style.display = "grid";
-      switchTeamScreen.style.display = "none";
-      boatPlacement(playerTwo, player2Name);
-    });
+    switchPlayer(
+      "placement-screen",
+      `Pass to ${player2Name} to place Ships!`,
+      `${player2Name} ready`,
+      () => {
+        const placementScreen = document.getElementById("placement-screen");
+        const switchTeamScreen = document.getElementById("switch-team-screen");
+        placementScreen.style.display = "grid";
+        switchTeamScreen.style.display = "none";
+        boatPlacement(playerTwo, player2Name, () => {
+          switchPlayer(
+            "placement-screen",
+            `Pass to ${player1Name} to Battle!`,
+            `${player1Name} ready`
+          );
+        });
+      }
+    );
   });
+}
+
+// Function for the switch player screen
+function switchPlayer(previousScreen, switchTitle, switchMessage, buttonFunc) {
+  const prevScreen = document.getElementById(previousScreen);
+  prevScreen.style.display = "none";
+  const switchTeamScreen = document.getElementById("switch-team-screen");
+  switchTeamScreen.style.display = "grid";
+  const switchTeamTitle = document.getElementById("switch-team-title");
+  switchTeamTitle.innerHTML = switchTitle;
+  const switchTeamButton = document.getElementById("switch-button");
+  switchTeamButton.innerHTML = switchMessage;
+  switchTeamButton.addEventListener("click", buttonFunc);
 }
 
 // Function to handle the boat placement phase for a player
