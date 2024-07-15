@@ -53,6 +53,23 @@ function singlePlayer(playerName) {
   });
 }
 
+function singleBattle(game) {
+  const eventListeners = {};
+
+  while (game.allShipsSunk === false) {
+    function playerPlay() {
+      for (let i = 0; i < 10; i++) {
+        for (let j = 10; j < 20; j++) {
+          const square = document.getElementsByClassName(`my-space ${i} ${j}`);
+          Array.from(square).forEach((square) => {
+            square.addEventListener("click");
+          });
+        }
+      }
+    }
+  }
+}
+
 // Function to start a two-player game
 function twoPlayer(player1Name, player2Name) {
   const twoPlayerGame = newGame();

@@ -3,7 +3,7 @@ import { newShip } from "./ship-factory";
 
 function newGameboard() {
   return {
-    missedAttacks: [],
+    attacks: [],
     allShipsSunk: false,
     ships: [],
     shipPositions: [],
@@ -80,7 +80,17 @@ function newGameboard() {
           return;
         }
       }
-      this.missedAttacks.push(coords);
+      this.attacks.push(coords);
+    },
+    computerAttack() {
+      let attackSuccess = false;
+      while (attackSuccess === false) {
+        let tryCoords = [generateRandom(10), generateRandom(10)];
+        if (!this.attacks.includes(tryCoords)) {
+          this.receiveAttack(tryCoords);
+          attackSuccess = true;
+        }
+      }
     },
   };
 }
@@ -100,11 +110,11 @@ function newGame() {
   };
 }
 
-function computerPlacement(computerGB) {
-  function generateRandom(max) {
-    return Math.floor(Math.random() * max);
-  }
+function generateRandom(max) {
+  return Math.floor(Math.random() * max);
+}
 
+function computerPlacement(computerGB) {
   function createLowerCoords() {
     return [generateRandom(10), generateRandom(10)];
   }
