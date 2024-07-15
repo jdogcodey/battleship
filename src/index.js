@@ -10,10 +10,6 @@ import { buttonClicker } from "./DOM.js";
 
 buttonClicker();
 
-const testGame = newGame("player1", "player2");
-computerPlacement(testGame.player1);
-console.log(testGame);
-
 // const testGameboard = newGameboard();
 // testGameboard.addShip([0, 0], [1, 0]);
 // testGameboard.addShip([5, 3], [5, 7]);

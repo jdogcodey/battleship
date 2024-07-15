@@ -159,6 +159,8 @@ function computerPlacement(computerGB) {
   // Ship lengths as required
   const shipLengths = [5, 4, 4, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2];
   shipLengths.forEach((length) => createShipCoords(length));
+
+  return computerGB;
 }
 
 export { newGameboard, newGame, computerPlacement };

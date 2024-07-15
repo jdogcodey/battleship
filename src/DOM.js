@@ -1,4 +1,4 @@
-import { newGame, computerPlacement } from "./gameboard-factory";
+import { newGame, computerPlacement, newGameboard } from "./gameboard-factory";
 
 // Function that sets up event listeners for the second player and start battle buttons
 function buttonClicker() {
@@ -36,8 +36,10 @@ function buttonClicker() {
 // Function to start a single-player game
 function singlePlayer(playerName) {
   const singleGame = newGame(); // Create a new game instance
+  singleGame.player1 = newGameboard();
   const playerOne = singleGame.player1;
   singleGame.player2 = computerPlacement(singleGame.player2); // Set up computer as the second player
+  console.log(singleGame);
   boatPlacement(playerOne, playerName, () => {
     // Start the boat placement phase
     const completePlacementScreen =
@@ -48,61 +50,106 @@ function singlePlayer(playerName) {
     completePlacementScreen.style.display = "grid";
     completePlacementButton.innerHTML = "Battle!";
     completePlacementButton.addEventListener("click", () => {
-      launchBattle("Battle!", () => {});
+      launchBattle("Battle!", () => singleBattle(singleGame));
     });
   });
 }
 
-function singleBattle(game) {
-  const eventListeners = {};
-
-  while (game.allShipsSunk === false) {
-    function playerPlay() {
-      for (let i = 0; i < 10; i++) {
-        for (let j = 10; j < 20; j++) {
-          const square = document.getElementsByClassName(`my-space ${i} ${j}`);
-          Array.from(square).forEach((square) => {
-            square.addEventListener("click");
-          });
-        }
+function computerReceiveAndAttack(j, i, game) {
+  game.player2.receiveAttack(`${j - 10}, ${i}`);
+  game.player1.computerAttack();
+  const computerReceivedAttacks = game.player2.attacks;
+  const playerReceivedAttacks = game.player1.attacks;
+  const playerShipPlacements = game.player1.shipPositions;
+  for (let i = 0; i < 10; i++) {
+    for (let j = 10; j < 20; j++) {
+      const coords = `${j - 10}, ${i}`;
+      const yourSquare = document.getElementsByClassName(
+        `your-square ${i} ${j}`
+      );
+      const mySquare = document.getElementsByClassName(`my-square ${i} ${j}`);
+      if (computerReceivedAttacks.includes(coords)) {
+        Array.from(yourSquare).forEach((square) => {
+          square.style.backgroundColor = "#D90429";
+        });
+      }
+      if (
+        playerShipPlacements.includes(coords) &&
+        playerReceivedAttacks.includes(coords)
+      ) {
+        Array.from(mySquare).forEach((square) => {
+          square.style.backgroundColor = `#D90429`;
+        });
+      } else if (playerShipPlacements.includes(coords)) {
+        Array.from(mySquare).forEach((square) => {
+          square.style.backgroundColor = "#2B2D42";
+        });
+      } else if (playerReceivedAttacks.includes(coords)) {
+        Array.from(mySquare).forEach((square) => {
+          square.style.border = "1px solid #EF233C";
+        });
       }
     }
   }
 }
 
-// Function to start a two-player game
-function twoPlayer(player1Name, player2Name) {
-  const twoPlayerGame = newGame();
-  const playerOne = twoPlayerGame.player1;
-  const playerTwo = twoPlayerGame.player2;
-  boatPlacement(playerOne, player1Name, () => {
-    const squares = document.getElementsByClassName("blank-space");
-    Array.from(squares).forEach((square) => {
-      square.style.backgroundColor = "#EDF2F4";
-    });
-    switchPlayer(
-      "placement-screen",
-      `Pass to ${player2Name} to place Ships!`,
-      `${player2Name} ready`,
-      () => {
-        const placementScreen = document.getElementById("placement-screen");
-        const switchTeamScreen = document.getElementById("switch-team-screen");
-        placementScreen.style.display = "grid";
-        switchTeamScreen.style.display = "none";
-        boatPlacement(playerTwo, player2Name, () => {
-          switchPlayer(
-            "placement-screen",
-            `Pass to ${player1Name} to Battle!`,
-            `${player1Name} ready`,
-            () => {
-              launchBattle(`${player1Name} - Battle!`, () => {});
-            }
-          );
-        });
-      }
-    );
-  });
+function playerPlay(game) {
+  for (let i = 0; i < 10; i++) {
+    for (let j = 10; j < 20; j++) {
+      const square = document.getElementsByClassName(`your-space ${i} ${j}`);
+      Array.from(square).forEach((square) => {
+        square.addEventListener("click", () =>
+          computerReceiveAndAttack(j, i, game)
+        );
+      });
+    }
+  }
 }
+
+function singleBattle(game) {
+  playerPlay(game);
+
+  // Monitor the game state
+  const gameInterval = setInterval(() => {
+    if (game.allShipsSunk) {
+      clearInterval(gameInterval);
+    }
+  }, 1000); // Check every second (adjust as needed)
+}
+
+// Function to start a two-player game
+// function twoPlayer(player1Name, player2Name) {
+//   const twoPlayerGame = newGame();
+//   const playerOne = twoPlayerGame.player1;
+//   const playerTwo = twoPlayerGame.player2;
+//   boatPlacement(playerOne, player1Name, () => {
+//     const squares = document.getElementsByClassName("blank-space");
+//     Array.from(squares).forEach((square) => {
+//       square.style.backgroundColor = "#EDF2F4";
+//     });
+//     switchPlayer(
+//       "placement-screen",
+//       `Pass to ${player2Name} to place Ships!`,
+//       `${player2Name} ready`,
+//       () => {
+//         const placementScreen = document.getElementById("placement-screen");
+//         const switchTeamScreen = document.getElementById("switch-team-screen");
+//         placementScreen.style.display = "grid";
+//         switchTeamScreen.style.display = "none";
+//         boatPlacement(playerTwo, player2Name, () => {
+//           switchPlayer(
+//             "placement-screen",
+//             `Pass to ${player1Name} to Battle!`,
+//             `${player1Name} ready`,
+//             () => {
+//               launchBattle(`${player1Name} - Battle!`, () => {});
+//             }
+//           );
+//         });
+//       }
+//     );
+//   });
+// }
 
 function launchBattle(title, func) {
   const placementScreen = document.getElementById("placement-screen");
