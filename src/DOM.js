@@ -48,7 +48,7 @@ function singlePlayer(playerName) {
     completePlacementScreen.style.display = "grid";
     completePlacementButton.innerHTML = "Battle!";
     completePlacementButton.addEventListener("click", () => {
-      launchBattle("Select where to Strike!", () => {});
+      launchBattle("Battle!", () => {});
     });
   });
 }
@@ -78,10 +78,7 @@ function twoPlayer(player1Name, player2Name) {
             `Pass to ${player1Name} to Battle!`,
             `${player1Name} ready`,
             () => {
-              launchBattle(
-                `${player1Name} - Select where to Strike!`,
-                () => {}
-              );
+              launchBattle(`${player1Name} - Battle!`, () => {});
             }
           );
         });
