@@ -36,10 +36,8 @@ function buttonClicker() {
 // Function to start a single-player game
 function singlePlayer(playerName) {
   const singleGame = newGame(); // Create a new game instance
-  singleGame.player1 = newGameboard();
   const playerOne = singleGame.player1;
   singleGame.player2 = computerPlacement(singleGame.player2); // Set up computer as the second player
-  console.log(singleGame);
   boatPlacement(playerOne, playerName, () => {
     // Start the boat placement phase
     const completePlacementScreen =
@@ -56,39 +54,118 @@ function singlePlayer(playerName) {
 }
 
 function computerReceiveAndAttack(j, i, game) {
-  game.player2.receiveAttack(`${j - 10}, ${i}`);
+  console.log("computer receive and attack running");
+  console.log(game);
+  game.player2.receiveAttack([`${j - 10}, ${i}`]);
   game.player1.computerAttack();
   const computerReceivedAttacks = game.player2.attacks;
   const playerReceivedAttacks = game.player1.attacks;
   const playerShipPlacements = game.player1.shipPositions;
+  console.log(computerReceivedAttacks);
+  console.log(playerReceivedAttacks);
+  console.log(playerShipPlacements);
   for (let i = 0; i < 10; i++) {
     for (let j = 10; j < 20; j++) {
-      const coords = `${j - 10}, ${i}`;
+      console.log(j);
+      console.log(i);
       const yourSquare = document.getElementsByClassName(
-        `your-square ${i} ${j}`
+        `your-space ${j} ${i}`
       );
-      const mySquare = document.getElementsByClassName(`my-square ${i} ${j}`);
-      if (computerReceivedAttacks.includes(coords)) {
-        Array.from(yourSquare).forEach((square) => {
-          square.style.backgroundColor = "#D90429";
-        });
+      const mySquare = document.getElementsByClassName(`my-space ${j} ${i}`);
+      for (let k = 0; k < computerReceivedAttacks.length; k++) {
+        if (
+          computerReceivedAttacks[k][0] === j - 10 &&
+          computerReceivedAttacks[k][1] === i
+        ) {
+          console.log("computer Received Attack here");
+          Array.from(yourSquare).forEach((square) => {
+            square.style.backgroundColor = "#D90429";
+          });
+        }
       }
-      if (
-        playerShipPlacements.includes(coords) &&
-        playerReceivedAttacks.includes(coords)
-      ) {
+
+      let playerAttacksTest;
+      let playerShipPlacementsTest;
+
+      for (let l = 0; l < playerReceivedAttacks.length; l++) {
+        if (
+          playerReceivedAttacks[l][0] === j - 10 &&
+          playerReceivedAttacks[l][1] === i
+        ) {
+          playerAttacksTest = true;
+        }
+      }
+      for (let m = 0; m < playerShipPlacements.length; m++) {
+        if (
+          playerShipPlacements[m][0] === j - 10 &&
+          playerShipPlacements[m][1] === i
+        ) {
+          playerShipPlacementsTest = true;
+        }
+      }
+      console.log(`playerAttacksTest`);
+
+      console.log(playerAttacksTest);
+      console.log(`playerShipPlacementsTest`);
+
+      console.log(playerShipPlacementsTest);
+
+      if (playerAttacksTest === true && playerShipPlacementsTest === true) {
         Array.from(mySquare).forEach((square) => {
           square.style.backgroundColor = `#D90429`;
         });
-      } else if (playerShipPlacements.includes(coords)) {
+      } else if (
+        playerShipPlacementsTest === true &&
+        playerAttacksTest !== true
+      ) {
         Array.from(mySquare).forEach((square) => {
           square.style.backgroundColor = "#2B2D42";
         });
-      } else if (playerReceivedAttacks.includes(coords)) {
+      } else if (
+        playerAttacksTest === true &&
+        playerShipPlacementsTest !== true
+      ) {
         Array.from(mySquare).forEach((square) => {
           square.style.border = "1px solid #EF233C";
         });
       }
+
+      // if (computerReceivedAttacks.includes(coords)) {
+      //   Array.from(yourSquare).forEach((square) => {
+      //     square.style.backgroundColor = "#D90429";
+      //   });
+      // }
+
+      // for (let l = 0; l < playerReceivedAttacks.length; l++) {
+      //   if (playerReceivedAttacks[l][0] === j - 10 && playerReceivedAttacks[l][1] === i) {
+      //     for (let m = 0; m < playerShipPlacements.length; m++) {
+      //       if (playerShipPlacements[m][0] === j - 10 && playerShipPlacements[m][1] === i) {
+      //         Array.from(mySquare).forEach((square) => {
+      //           square.style.backgroundColor = `#D90429`;
+      //         });
+      //       } else Array.from(mySquare).forEach((square) => {
+      //         square.style.backgroundColor = "#2B2D42";
+      //       });
+      //     }
+      //   }
+      // }
+
+      // if (
+      //   playerShipPlacements.includes(coords) &&
+      //   playerReceivedAttacks.includes(coords)
+      // ) {
+      //   Array.from(mySquare).forEach((square) => {
+      //     square.style.backgroundColor = `#D90429`;
+      //   });
+      // } else if (playerShipPlacements.includes(coords)) {
+      //   Array.from(mySquare).forEach((square) => {
+      //     square.style.backgroundColor = "#2B2D42";
+      //   });
+      // } else if (playerReceivedAttacks.includes(coords)) {
+      //   Array.from(mySquare).forEach((square) => {
+      //     square.style.border = "1px solid #EF233C";
+      //   });
+      // }
     }
   }
 }
@@ -96,7 +173,7 @@ function computerReceiveAndAttack(j, i, game) {
 function playerPlay(game) {
   for (let i = 0; i < 10; i++) {
     for (let j = 10; j < 20; j++) {
-      const square = document.getElementsByClassName(`your-space ${i} ${j}`);
+      const square = document.getElementsByClassName(`your-space ${j} ${i}`);
       Array.from(square).forEach((square) => {
         square.addEventListener("click", () =>
           computerReceiveAndAttack(j, i, game)
@@ -118,38 +195,38 @@ function singleBattle(game) {
 }
 
 // Function to start a two-player game
-// function twoPlayer(player1Name, player2Name) {
-//   const twoPlayerGame = newGame();
-//   const playerOne = twoPlayerGame.player1;
-//   const playerTwo = twoPlayerGame.player2;
-//   boatPlacement(playerOne, player1Name, () => {
-//     const squares = document.getElementsByClassName("blank-space");
-//     Array.from(squares).forEach((square) => {
-//       square.style.backgroundColor = "#EDF2F4";
-//     });
-//     switchPlayer(
-//       "placement-screen",
-//       `Pass to ${player2Name} to place Ships!`,
-//       `${player2Name} ready`,
-//       () => {
-//         const placementScreen = document.getElementById("placement-screen");
-//         const switchTeamScreen = document.getElementById("switch-team-screen");
-//         placementScreen.style.display = "grid";
-//         switchTeamScreen.style.display = "none";
-//         boatPlacement(playerTwo, player2Name, () => {
-//           switchPlayer(
-//             "placement-screen",
-//             `Pass to ${player1Name} to Battle!`,
-//             `${player1Name} ready`,
-//             () => {
-//               launchBattle(`${player1Name} - Battle!`, () => {});
-//             }
-//           );
-//         });
-//       }
-//     );
-//   });
-// }
+function twoPlayer(player1Name, player2Name) {
+  const twoPlayerGame = newGame();
+  const playerOne = twoPlayerGame.player1;
+  const playerTwo = twoPlayerGame.player2;
+  boatPlacement(playerOne, player1Name, () => {
+    const squares = document.getElementsByClassName("blank-space");
+    Array.from(squares).forEach((square) => {
+      square.style.backgroundColor = "#EDF2F4";
+    });
+    switchPlayer(
+      "placement-screen",
+      `Pass to ${player2Name} to place Ships!`,
+      `${player2Name} ready`,
+      () => {
+        const placementScreen = document.getElementById("placement-screen");
+        const switchTeamScreen = document.getElementById("switch-team-screen");
+        placementScreen.style.display = "grid";
+        switchTeamScreen.style.display = "none";
+        boatPlacement(playerTwo, player2Name, () => {
+          switchPlayer(
+            "placement-screen",
+            `Pass to ${player1Name} to Battle!`,
+            `${player1Name} ready`,
+            () => {
+              launchBattle(`${player1Name} - Battle!`, () => {});
+            }
+          );
+        });
+      }
+    );
+  });
+}
 
 function launchBattle(title, func) {
   const placementScreen = document.getElementById("placement-screen");
