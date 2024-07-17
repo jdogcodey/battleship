@@ -54,25 +54,21 @@ function singlePlayer(playerName) {
 }
 
 function computerReceiveAndAttack(j, i, game) {
-  console.log("computer receive and attack running");
-  console.log(game);
-  game.player2.receiveAttack([`${j - 10}, ${i}`]);
+  game.player2.receiveAttack([j - 10, i]);
   game.player1.computerAttack();
   const computerReceivedAttacks = game.player2.attacks;
   const playerReceivedAttacks = game.player1.attacks;
   const playerShipPlacements = game.player1.shipPositions;
-  console.log(computerReceivedAttacks);
-  console.log(playerReceivedAttacks);
-  console.log(playerShipPlacements);
+  console.log(game);
   for (let i = 0; i < 10; i++) {
     for (let j = 10; j < 20; j++) {
-      console.log(j);
-      console.log(i);
       const yourSquare = document.getElementsByClassName(
         `your-space ${j} ${i}`
       );
       const mySquare = document.getElementsByClassName(`my-space ${j} ${i}`);
+      console.log(computerReceivedAttacks);
       for (let k = 0; k < computerReceivedAttacks.length; k++) {
+        console.log("running loop");
         if (
           computerReceivedAttacks[k][0] === j - 10 &&
           computerReceivedAttacks[k][1] === i
@@ -103,12 +99,6 @@ function computerReceiveAndAttack(j, i, game) {
           playerShipPlacementsTest = true;
         }
       }
-      console.log(`playerAttacksTest`);
-
-      console.log(playerAttacksTest);
-      console.log(`playerShipPlacementsTest`);
-
-      console.log(playerShipPlacementsTest);
 
       if (playerAttacksTest === true && playerShipPlacementsTest === true) {
         Array.from(mySquare).forEach((square) => {
