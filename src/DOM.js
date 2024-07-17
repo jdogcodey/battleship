@@ -1,4 +1,9 @@
-import { newGame, computerPlacement, newGameboard } from "./gameboard-factory";
+import {
+  newGame,
+  computerPlacement,
+  newGameboard,
+  generateRandom,
+} from "./gameboard-factory";
 
 // Function that sets up event listeners for the second player and start battle buttons
 function buttonClicker() {
@@ -36,6 +41,7 @@ function buttonClicker() {
 // Function to start a single-player game
 function singlePlayer(playerName) {
   const singleGame = newGame(); // Create a new game instance
+  console.log(singleGame);
   const playerOne = singleGame.player1;
   singleGame.player2 = computerPlacement(singleGame.player2); // Set up computer as the second player
   boatPlacement(playerOne, playerName, () => {
@@ -48,118 +54,37 @@ function singlePlayer(playerName) {
     completePlacementScreen.style.display = "grid";
     completePlacementButton.innerHTML = "Battle!";
     completePlacementButton.addEventListener("click", () => {
-      launchBattle("Battle!", () => singleBattle(singleGame));
+      addShipPositions(singleGame);
+      updateDisplay(singleGame);
+      launchBattle("Battle!", () => playerPlay(singleGame));
     });
   });
 }
 
-function computerReceiveAndAttack(j, i, game) {
-  game.player2.receiveAttack([j - 10, i]);
-  game.player1.computerAttack();
-  const computerReceivedAttacks = game.player2.attacks;
-  const playerReceivedAttacks = game.player1.attacks;
-  const playerShipPlacements = game.player1.shipPositions;
-  console.log(game);
-  for (let i = 0; i < 10; i++) {
-    for (let j = 10; j < 20; j++) {
-      const yourSquare = document.getElementsByClassName(
-        `your-space ${j} ${i}`
-      );
-      const mySquare = document.getElementsByClassName(`my-space ${j} ${i}`);
-      console.log(computerReceivedAttacks);
-      for (let k = 0; k < computerReceivedAttacks.length; k++) {
-        console.log("running loop");
-        if (
-          computerReceivedAttacks[k][0] === j - 10 &&
-          computerReceivedAttacks[k][1] === i
-        ) {
-          console.log("computer Received Attack here");
-          Array.from(yourSquare).forEach((square) => {
-            square.style.backgroundColor = "#D90429";
-          });
-        }
-      }
+// Function to add both players ship positions to the squares array in the array
+function addShipPositions(game) {
+  const player1ShipPositions = game.player1.shipPositions;
+  const player2ShipPositions = game.player2.shipPositions;
 
-      let playerAttacksTest;
-      let playerShipPlacementsTest;
-
-      for (let l = 0; l < playerReceivedAttacks.length; l++) {
-        if (
-          playerReceivedAttacks[l][0] === j - 10 &&
-          playerReceivedAttacks[l][1] === i
-        ) {
-          playerAttacksTest = true;
-        }
-      }
-      for (let m = 0; m < playerShipPlacements.length; m++) {
-        if (
-          playerShipPlacements[m][0] === j - 10 &&
-          playerShipPlacements[m][1] === i
-        ) {
-          playerShipPlacementsTest = true;
-        }
-      }
-
-      if (playerAttacksTest === true && playerShipPlacementsTest === true) {
-        Array.from(mySquare).forEach((square) => {
-          square.style.backgroundColor = `#D90429`;
-        });
-      } else if (
-        playerShipPlacementsTest === true &&
-        playerAttacksTest !== true
-      ) {
-        Array.from(mySquare).forEach((square) => {
-          square.style.backgroundColor = "#2B2D42";
-        });
-      } else if (
-        playerAttacksTest === true &&
-        playerShipPlacementsTest !== true
-      ) {
-        Array.from(mySquare).forEach((square) => {
-          square.style.border = "1px solid #EF233C";
-        });
-      }
-
-      // if (computerReceivedAttacks.includes(coords)) {
-      //   Array.from(yourSquare).forEach((square) => {
-      //     square.style.backgroundColor = "#D90429";
-      //   });
-      // }
-
-      // for (let l = 0; l < playerReceivedAttacks.length; l++) {
-      //   if (playerReceivedAttacks[l][0] === j - 10 && playerReceivedAttacks[l][1] === i) {
-      //     for (let m = 0; m < playerShipPlacements.length; m++) {
-      //       if (playerShipPlacements[m][0] === j - 10 && playerShipPlacements[m][1] === i) {
-      //         Array.from(mySquare).forEach((square) => {
-      //           square.style.backgroundColor = `#D90429`;
-      //         });
-      //       } else Array.from(mySquare).forEach((square) => {
-      //         square.style.backgroundColor = "#2B2D42";
-      //       });
-      //     }
-      //   }
-      // }
-
-      // if (
-      //   playerShipPlacements.includes(coords) &&
-      //   playerReceivedAttacks.includes(coords)
-      // ) {
-      //   Array.from(mySquare).forEach((square) => {
-      //     square.style.backgroundColor = `#D90429`;
-      //   });
-      // } else if (playerShipPlacements.includes(coords)) {
-      //   Array.from(mySquare).forEach((square) => {
-      //     square.style.backgroundColor = "#2B2D42";
-      //   });
-      // } else if (playerReceivedAttacks.includes(coords)) {
-      //   Array.from(mySquare).forEach((square) => {
-      //     square.style.border = "1px solid #EF233C";
-      //   });
-      // }
-    }
-  }
+  player1ShipPositions.forEach((position) => {
+    const [a, b] = position;
+    const player1Total = a + b;
+    game.squares[player1Total][2] = true;
+  });
+  player2ShipPositions.forEach((position) => {
+    const [c, d] = position;
+    const player2Total = c + d;
+    game.squares[player2Total][3] = true;
+  });
 }
 
+function computerReceiveAndAttack(j, i, game) {
+  // Attack the clicked square and randomly attack from the computer
+  game.player2.receiveAttack([j - 10, i]);
+  computerAttack(game.player1);
+}
+
+// Function to add event listener to each square for the player to play on
 function playerPlay(game) {
   for (let i = 0; i < 10; i++) {
     for (let j = 10; j < 20; j++) {
@@ -171,17 +96,6 @@ function playerPlay(game) {
       });
     }
   }
-}
-
-function singleBattle(game) {
-  playerPlay(game);
-
-  // Monitor the game state
-  const gameInterval = setInterval(() => {
-    if (game.allShipsSunk) {
-      clearInterval(gameInterval);
-    }
-  }, 1000); // Check every second (adjust as needed)
 }
 
 // Function to start a two-player game
@@ -441,6 +355,32 @@ function generateBoatVisual(shipPositions) {
       squareToColour.style.backgroundColor = "#2B2D42";
     });
   });
+}
+
+function computerAttack(computerPlayer) {
+  let attackSuccess = false;
+  while (attackSuccess === false) {
+    let tryCoords = [generateRandom(10), generateRandom(10)];
+    if (!computerPlayer.attacks.includes(tryCoords)) {
+      computerPlayer.receiveAttack(tryCoords);
+      attackSuccess = true;
+    }
+  }
+}
+
+function updateDisplay(game) {
+  const player1ShipPositions = game.player1.shipPositions;
+
+  for (let i = 0; i < player1ShipPositions.length; i++) {
+    const [a, b] = player1ShipPositions[i];
+    const newA = a + 10;
+    console.log(a);
+    console.log(b);
+    const square = document.getElementsByClassName(`my-space ${newA} ${b}`);
+    Array.from(square).forEach((square) => {
+      square.style.backgroundColor = `#2B2D42`;
+    });
+  }
 }
 
 export { buttonClicker };

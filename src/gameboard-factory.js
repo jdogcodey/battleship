@@ -95,11 +95,22 @@ function newGameboard() {
   };
 }
 
+function createSquares() {
+  const squareArray = [];
+  for (let i = 0; i < 10; i++) {
+    for (let j = 0; j < 10; j++) {
+      squareArray.push([i, j, false, false, false, false]);
+    }
+  }
+  return squareArray;
+}
+
 function newGame() {
   return {
     player1: newGameboard(),
     player2: newGameboard(),
     winner: null,
+    squares: createSquares(),
     gameOver() {
       if (this.player1.allShipsSunk) {
         this.winner = player2;
