@@ -57,8 +57,8 @@ function singlePlayer(playerName) {
     completePlacementButton.innerHTML = "Battle!";
     completePlacementButton.addEventListener("click", () => {
       console.log("complete placement clicked");
-      addShipPositions(singleGame);
-      shipPositionDisplay(singleGame.player1, `my-space`);
+      // addShipPositions(singleGame);
+      shipPositionDisplay(singleGame.player1.shipPositions, `my-space`);
       launchBattle("Battle!", () =>
         playerPlay(singleGame, singleGame.player1, singleGame.player2)
       );
@@ -90,6 +90,7 @@ function playerPlay(game, playing, notPlaying) {
       const square = document.getElementsByClassName(`your-space ${j} ${i}`);
       Array.from(square).forEach((square) => {
         square.addEventListener("click", () => {
+          console.log(game);
           game.player2.receiveAttack([j - 10, i]);
           computerAttack(game.player1);
           clearDisplay();
@@ -376,7 +377,7 @@ function computerAttack(computerPlayer) {
   while (attackSuccess === false) {
     let tryCoords = [generateRandom(10), generateRandom(10)];
     let [a, b] = tryCoords;
-    let tryTotal = a * 10 + b * 10;
+    let tryTotal = a * 10 + b;
     if (computerPlayer.shipPositions[tryTotal][4] !== true) {
       computerPlayer.receiveAttack(tryCoords);
       attackSuccess = true;

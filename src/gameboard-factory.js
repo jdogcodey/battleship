@@ -103,12 +103,14 @@ function newGameboard() {
       for (let i = 0; i < this.shipPositions.length; i++) {
         if (
           coords[0] === this.shipPositions[noTotal][0] &&
-          coords[1] === this.shipPositions[noTotal][1] &&
-          this.shipPositions[noTotal]
+          coords[1] === this.shipPositions[noTotal][1]
         ) {
-          this.attacks.push(coords);
+          // this.attacks.push(coords);
           this.shipPositions[noTotal][4] = true;
-          this.ships[this.shipPositions[i][2]].hit();
+          if (this.shipPositions[i][2]) {
+            this.ships[this.shipPositions[i][2]].hit();
+          }
+
           this.allShipsSunk = this.ships.every((ship) => ship.sunk);
           return;
         }
