@@ -44,7 +44,9 @@ function singlePlayer(playerName) {
   console.log(singleGame);
   const playerOne = singleGame.player1;
   singleGame.player2 = computerPlacement(singleGame.player2); // Set up computer as the second player
+  console.log(singleGame);
   boatPlacement(playerOne, playerName, () => {
+    console.log("boat Placement triggered");
     // Start the boat placement phase
     const completePlacementScreen =
       document.getElementById("complete-placement");
@@ -54,9 +56,12 @@ function singlePlayer(playerName) {
     completePlacementScreen.style.display = "grid";
     completePlacementButton.innerHTML = "Battle!";
     completePlacementButton.addEventListener("click", () => {
+      console.log("complete placement clicked");
       addShipPositions(singleGame);
-      updateDisplay(singleGame);
-      launchBattle("Battle!", () => playerPlay(singleGame));
+      shipPositionDisplay(singleGame.player1, `my-space`);
+      launchBattle("Battle!", () =>
+        playerPlay(singleGame, singleGame.player1, singleGame.player2)
+      );
     });
   });
 }
@@ -78,21 +83,18 @@ function addShipPositions(game) {
   });
 }
 
-function computerReceiveAndAttack(j, i, game) {
-  // Attack the clicked square and randomly attack from the computer
-  game.player2.receiveAttack([j - 10, i]);
-  computerAttack(game.player1);
-}
-
 // Function to add event listener to each square for the player to play on
-function playerPlay(game) {
+function playerPlay(game, playing, notPlaying) {
   for (let i = 0; i < 10; i++) {
     for (let j = 10; j < 20; j++) {
       const square = document.getElementsByClassName(`your-space ${j} ${i}`);
       Array.from(square).forEach((square) => {
-        square.addEventListener("click", () =>
-          computerReceiveAndAttack(j, i, game)
-        );
+        square.addEventListener("click", () => {
+          game.player2.receiveAttack([j - 10, i]);
+          computerAttack(game.player1);
+          clearDisplay();
+          entireDisplay(playing, notPlaying);
+        });
       });
     }
   }
@@ -159,6 +161,7 @@ function switchPlayer(previousScreen, switchTitle, switchMessage, buttonFunc) {
 
 // Function to handle the boat placement phase for a player
 function boatPlacement(player, playerName, callback) {
+  console.log("boat placement");
   const playerPlacementScreen = document.getElementById("placement-screen");
   const title = document.getElementsByClassName("screen-title");
   Array.from(title).forEach((title) => {
@@ -271,6 +274,9 @@ function placeBoat(length, player, updateBoatNumber) {
       [newj, i - length + 1],
     ];
 
+    console.log(initialSelection);
+    console.log(possibleEnd);
+
     // Remove invalid end positions that overlap existing ships
     const validEnds = possibleEnd.filter((coord) => {
       const xRange = [
@@ -287,10 +293,11 @@ function placeBoat(length, player, updateBoatNumber) {
             x < 10 &&
             y >= 0 &&
             y < 10 &&
-            !player.shipPositions.some((pos) => pos[0] === x && pos[1] === y)
+            !player.shipPositions.some(
+              (pos) => pos[0] === x && pos[1] === y && pos[3]
+            )
         )
       );
-
       return isValid;
     });
 
@@ -302,7 +309,10 @@ function placeBoat(length, player, updateBoatNumber) {
       return; // Exit without decrementing boat count or updating UI
     }
 
+    console.log(validEnds);
+
     validEnds.forEach((coord) => {
+      console.log("valid ends triggered");
       const squareToRead = document.getElementsByClassName(
         `blank-space ${coord[0] + 10} ${coord[1]}`
       );
@@ -311,9 +321,12 @@ function placeBoat(length, player, updateBoatNumber) {
         const selectEnd = function (event) {
           event.preventDefault();
           secondSelection = [coord[0], coord[1]];
+          console.log(secondSelection);
           const success = player.addShip(initialSelection, secondSelection);
           if (success) {
-            generateBoatVisual(player.shipPositions); // Visualize the placed boats
+            clearDisplay();
+            shipPositionDisplay(player.shipPositions, `blank-space`);
+            // generateBoatVisual(player.shipPositions); // Visualize the placed boats
             square.removeEventListener("click", selectEnd);
             updateBoatNumber(); // Update the number of remaining boats
           }
@@ -357,29 +370,118 @@ function generateBoatVisual(shipPositions) {
   });
 }
 
+// Function for the computer to randomly attack
 function computerAttack(computerPlayer) {
   let attackSuccess = false;
   while (attackSuccess === false) {
     let tryCoords = [generateRandom(10), generateRandom(10)];
-    if (!computerPlayer.attacks.includes(tryCoords)) {
+    let [a, b] = tryCoords;
+    let tryTotal = a * 10 + b * 10;
+    if (computerPlayer.shipPositions[tryTotal][4] !== true) {
       computerPlayer.receiveAttack(tryCoords);
       attackSuccess = true;
+    }
+    // if (!computerPlayer.attacks.includes(tryCoords)) {
+    //   computerPlayer.receiveAttack(tryCoords);
+    //   attackSuccess = true;
+    // }
+  }
+}
+
+// Function to display the position of all ships for one player
+function shipPositionDisplay(playerShipPositions, gameboard) {
+  for (let i = 0; i < playerShipPositions.length; i++) {
+    if (playerShipPositions[i][3] === true) {
+      const [a, b] = playerShipPositions[i];
+      const newA = a + 10;
+      console.log(a);
+      console.log(b);
+      const square = document.getElementsByClassName(
+        `${gameboard} ${newA} ${b}`
+      );
+      Array.from(square).forEach((square) => {
+        square.style.backgroundColor = `#2B2D42`;
+      });
     }
   }
 }
 
-function updateDisplay(game) {
-  const player1ShipPositions = game.player1.shipPositions;
+// Function to clear the background for all squares on the screen
+function clearDisplay() {
+  for (let i = 0; i < 10; i++) {
+    for (let j = 10; j < 20; j++) {
+      const mySquare = document.getElementsByClassName(`my-space ${j} ${i}`);
+      const yourSquare = document.getElementsByClassName(
+        `your-space ${j} ${i}`
+      );
+      const blankSquare = document.getElementsByClassName(
+        `blank-space ${j} ${i}`
+      );
+      Array.from(mySquare).forEach((square) => {
+        square.style.background = `#EDF2F4`;
+        square.style.border = `1px solid #8D99AE`;
+      });
+      Array.from(yourSquare).forEach((square) => {
+        square.style.background = `#EDF2F4`;
+        square.style.border = `1px solid #8D99AE`;
+      });
+      Array.from(blankSquare).forEach((square) => {
+        square.style.background = `#EDF2F4`;
+        square.style.border = `1px solid #8D99AE`;
+      });
+    }
+  }
+}
 
-  for (let i = 0; i < player1ShipPositions.length; i++) {
-    const [a, b] = player1ShipPositions[i];
-    const newA = a + 10;
-    console.log(a);
-    console.log(b);
-    const square = document.getElementsByClassName(`my-space ${newA} ${b}`);
-    Array.from(square).forEach((square) => {
-      square.style.backgroundColor = `#2B2D42`;
-    });
+function entireDisplay(playing, notPlaying) {
+  for (let i = 0; i < 100; i++) {
+    const a = playing.shipPositions[i][0];
+    const b = playing.shipPositions[i][1];
+
+    const mySquare = document.getElementsByClassName(`my-space ${a + 10} ${b}`);
+    const yourSquare = document.getElementsByClassName(
+      `your-space ${a + 10} ${b}`
+    );
+
+    if (
+      playing.shipPositions[i][3] === true &&
+      playing.shipPositions[i][4] === true
+    ) {
+      Array.from(mySquare).forEach((square) => {
+        square.style.backgroundColor = "#D90429";
+      });
+    } else if (
+      playing.shipPositions[i][3] === true &&
+      playing.shipPositions[i][4] !== true
+    ) {
+      Array.from(mySquare).forEach((square) => {
+        square.style.backgroundColor = "#2B2D42";
+      });
+    } else if (
+      playing.shipPositions[i][3] !== true &&
+      playing.shipPositions[i][4] === true
+    ) {
+      Array.from(mySquare).forEach((square) => {
+        square.style.border = `1px solid #EF233C`;
+      });
+    }
+
+    if (
+      notPlaying.shipPositions[i][3] === true &&
+      notPlaying.shipPositions[i][4]
+    ) {
+      Array.from(yourSquare).forEach((square) => {
+        square.style.backgroundColor = "#D90429";
+      });
+    } else if (
+      notPlaying.shipPositions[i][3] !== true &&
+      notPlaying.shipPositions[i][4]
+    ) {
+      Array.from(yourSquare).forEach((square) => {
+        square.style.border = `1px solid #EF233C`;
+        square.style.backgroundColor = `#8D99AE`;
+      });
+    }
   }
 }
 

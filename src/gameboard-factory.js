@@ -3,12 +3,14 @@ import { newShip } from "./ship-factory";
 
 function newGameboard() {
   return {
-    attacks: [],
     allShipsSunk: false,
     ships: [],
-    shipPositions: [],
+    shipPositions: createSquares(),
     shipCounter: 0,
     addShip(firstCoord, secondCoord) {
+      console.log("Adding ship");
+      console.log(firstCoord);
+      console.log(secondCoord);
       const [a, b] = firstCoord;
       const [x, y] = secondCoord;
       let shipCoordinates = [];
@@ -30,36 +32,64 @@ function newGameboard() {
       if (a === x) {
         // horizontal ship
         for (let i = Math.min(b, y); i <= Math.max(b, y); i++) {
+          console.log("horizontal ship");
           shipCoordinates.push([a, i]);
         }
       } else if (b === y) {
         // vertical ship
         for (let i = Math.min(a, x); i <= Math.max(a, x); i++) {
+          console.log("vertical ship");
           shipCoordinates.push([i, b]);
         }
       } else {
+        console.log("invalid ship placement");
         return; // Invalid ship placement
       }
+
+      console.log(shipCoordinates[0]);
+
       // Check for overlapping ships
       for (let i = 0; i < shipCoordinates.length; i++) {
-        for (let j = 0; j < this.shipPositions.length; j++) {
-          if (
-            shipCoordinates[i][0] === this.shipPositions[j][0] &&
-            shipCoordinates[i][1] === this.shipPositions[j][1]
-          ) {
-            return; // Overlapping, so return without adding ship
-          }
+        console.log("checking for overlapping ship");
+        const noTotal = shipCoordinates[i][0] * 10 + shipCoordinates[i][1];
+        if (
+          this.shipPositions[noTotal][0] === shipCoordinates[i][0] &&
+          this.shipPositions[noTotal][1] === shipCoordinates[i][1] &&
+          this.shipPositions[noTotal][3]
+        ) {
+          console.log("overlapping");
+          return; // Overlapping so return without adding ship
         }
       }
 
-      // Add ship coordinates
-      this.shipPositions.push(
-        ...shipCoordinates.map((coords) => [
-          coords[0],
-          coords[1],
-          this.shipCounter,
-        ])
-      );
+      // // Check for overlapping ships
+      // for (let i = 0; i < shipCoordinates.length; i++) {
+      //   for (let j = 0; j < this.shipPositions.length; j++) {
+      //     if (
+      //       shipCoordinates[i][0] === this.shipPositions[j][0] &&
+      //       shipCoordinates[i][1] === this.shipPositions[j][1]
+      //     ) {
+      //       return; // Overlapping, so return without adding ship
+      //     }
+      //   }
+      // }
+
+      for (let i = 0; i < shipCoordinates.length; i++) {
+        const noTotal = shipCoordinates[i][0] * 10 + shipCoordinates[i][1];
+        this.shipPositions[noTotal][0] = shipCoordinates[i][0];
+        this.shipPositions[noTotal][1] = shipCoordinates[i][1];
+        this.shipPositions[noTotal][2] = this.shipCounter;
+        this.shipPositions[noTotal][3] = true;
+      }
+
+      // // Add ship coordinates
+      // this.shipPositions.push(
+      //   ...shipCoordinates.map((coords) => [
+      //     coords[0],
+      //     coords[1],
+      //     this.shipCounter,
+      //   ])
+      // );
 
       this.ships.push(newShip(shipCoordinates.length)); // Use shipCoordinates.length as ship length
       this.shipCounter++;
@@ -69,28 +99,33 @@ function newGameboard() {
       array.push([firstVal, secondVal, this.shipCounter]);
     },
     receiveAttack(coords) {
+      const noTotal = coords[0] * 10 + coords[1];
       for (let i = 0; i < this.shipPositions.length; i++) {
         if (
-          coords[0] === this.shipPositions[i][0] &&
-          coords[1] === this.shipPositions[i][1]
+          coords[0] === this.shipPositions[noTotal][0] &&
+          coords[1] === this.shipPositions[noTotal][1] &&
+          this.shipPositions[noTotal]
         ) {
+          this.attacks.push(coords);
+          this.shipPositions[noTotal][4] = true;
           this.ships[this.shipPositions[i][2]].hit();
-          this.shipPositions.splice(i, 1);
           this.allShipsSunk = this.ships.every((ship) => ship.sunk);
           return;
         }
       }
-      this.attacks.push(coords);
-    },
-    computerAttack() {
-      let attackSuccess = false;
-      while (attackSuccess === false) {
-        let tryCoords = [generateRandom(10), generateRandom(10)];
-        if (!this.attacks.includes(tryCoords)) {
-          this.receiveAttack(tryCoords);
-          attackSuccess = true;
-        }
-      }
+
+      //     for (let i = 0; i < this.shipPositions.length; i++) {
+      //       if (
+      //         coords[0] === this.shipPositions[i][0] &&
+      //         coords[1] === this.shipPositions[i][1]
+      //       ) {
+      //         this.ships[this.shipPositions[i][2]].hit();
+      //         this.shipPositions.splice(i, 1);
+      //         this.allShipsSunk = this.ships.every((ship) => ship.sunk);
+      //         return;
+      //       }
+      //     }
+      //     this.attacks.push(coords);
     },
   };
 }
@@ -99,7 +134,7 @@ function createSquares() {
   const squareArray = [];
   for (let i = 0; i < 10; i++) {
     for (let j = 0; j < 10; j++) {
-      squareArray.push([i, j, false, false, false, false]);
+      squareArray.push([i, j, false, false, false]);
     }
   }
   return squareArray;
@@ -110,7 +145,6 @@ function newGame() {
     player1: newGameboard(),
     player2: newGameboard(),
     winner: null,
-    squares: createSquares(),
     gameOver() {
       if (this.player1.allShipsSunk) {
         this.winner = player2;
@@ -174,4 +208,4 @@ function computerPlacement(computerGB) {
   return computerGB;
 }
 
-export { newGameboard, newGame, computerPlacement };
+export { newGameboard, newGame, computerPlacement, generateRandom };
