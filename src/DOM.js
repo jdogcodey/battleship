@@ -66,6 +66,8 @@ function singlePlayer(playerName) {
   });
 }
 
+function updateBoatTable(player) {}
+
 // Function to add both players ship positions to the squares array in the array
 function addShipPositions(game) {
   const player1ShipPositions = game.player1.shipPositions;
@@ -89,8 +91,9 @@ function playerPlay(game, playing, notPlaying) {
     for (let j = 10; j < 20; j++) {
       const square = document.getElementsByClassName(`your-space ${j} ${i}`);
       Array.from(square).forEach((square) => {
-        square.addEventListener("click", () => {
+        square.addEventListener("click", function clickFunction() {
           console.log(game);
+          square.removeEventListener("click", clickFunction);
           game.player2.receiveAttack([j - 10, i]);
           computerAttack(game.player1);
           clearDisplay();

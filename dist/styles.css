@@ -69,8 +69,13 @@ header {
     border-radius: 5px;
 }
 
-#placement-screen, #play-screen {
+#placement-screen {
     grid-template: 3 / 2;
+    gap: 20px;
+}
+
+#play-screen {
+    grid-template: 4 / 2;
     gap: 20px;
 }
 
@@ -96,6 +101,7 @@ header {
 #left-title, #right-title {
     text-align: center;
     font-size: 1.2rem;
+    margin: 0px;
 }
 
 .pick-table {
@@ -146,5 +152,19 @@ header {
 
 #player-2-game {
     grid-template: 3 / 2 / 4 / 3;
+}
+
+.my-ship-table {
+    grid-template: 4 / 1 / 5 / 2;
+}
+
+.your-ship-table {
+    grid-template: 4 / 2 / 5 / 3;
+}
+
+.my-ship-table, .your-ship-table {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
