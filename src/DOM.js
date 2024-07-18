@@ -172,11 +172,11 @@ function boatPlacement(player, playerName, callback) {
 
   // Define the configurations for each type of boat
   const boatConfigurations = [
-    { type: "carrier", count: 1, length: 5 },
-    { type: "battleship", count: 2, length: 4 },
-    { type: "destroyer", count: 3, length: 3 },
-    { type: "submarine", count: 4, length: 3 },
-    { type: "patrol-boat", count: 5, length: 2 },
+    { type: "Carrier", count: 1, length: 5 },
+    { type: "Battleship", count: 2, length: 4 },
+    { type: "Destroyer", count: 3, length: 3 },
+    { type: "Submarine", count: 4, length: 3 },
+    { type: "Patrol-Boat", count: 5, length: 2 },
   ];
 
   placementSelector(player, boatConfigurations, callback); // Start the placement selector
@@ -196,6 +196,7 @@ function placementSelector(player, boatConfigurations, callback) {
       boatVisual,
       player,
       boatConfigurations,
+      config.type,
       callback
     ); // Set up the event listeners for boat placement
   });
@@ -209,12 +210,13 @@ function placeAndUpdateBoat(
   boatVisual,
   player,
   boatConfigurations,
+  type,
   callback
 ) {
   Array.from(boatElements).forEach((boat) => {
     const clickHandler = () => {
       if (boatNumber.count > 0) {
-        placeBoat(boatLength, player, () => {
+        placeBoat(boatLength, player, type, () => {
           boatNumber.count--;
           updateBoatNoInPage(boatVisual, boatNumber.count); // Update the UI with the new count
           if (checkAllBoatsPlaced(boatConfigurations)) callback(); // Call the callback if all boats have been placed
@@ -239,7 +241,7 @@ function updateBoatNoInPage(boatVisual, boatNumber) {
 }
 
 // Function to handle the placement of a boat on the board
-function placeBoat(length, player, updateBoatNumber) {
+function placeBoat(length, player, type, updateBoatNumber) {
   let initialSelection;
   let secondSelection;
 
@@ -323,7 +325,11 @@ function placeBoat(length, player, updateBoatNumber) {
           event.preventDefault();
           secondSelection = [coord[0], coord[1]];
           console.log(secondSelection);
-          const success = player.addShip(initialSelection, secondSelection);
+          const success = player.addShip(
+            initialSelection,
+            secondSelection,
+            type
+          );
           if (success) {
             clearDisplay();
             shipPositionDisplay(player.shipPositions, `blank-space`);
@@ -388,6 +394,10 @@ function computerAttack(computerPlayer) {
     // }
   }
 }
+
+// Add sink ships and change colour of sunk ships - possibly add a counter of what ships are left
+// Add end game
+// Implement second player
 
 // Function to display the position of all ships for one player
 function shipPositionDisplay(playerShipPositions, gameboard) {

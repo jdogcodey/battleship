@@ -7,7 +7,7 @@ function newGameboard() {
     ships: [],
     shipPositions: createSquares(),
     shipCounter: 0,
-    addShip(firstCoord, secondCoord) {
+    addShip(firstCoord, secondCoord, type) {
       console.log("Adding ship");
       console.log(firstCoord);
       console.log(secondCoord);
@@ -91,7 +91,7 @@ function newGameboard() {
       //   ])
       // );
 
-      this.ships.push(newShip(shipCoordinates.length)); // Use shipCoordinates.length as ship length
+      this.ships.push(newShip(shipCoordinates.length, type)); // Use shipCoordinates.length as ship length
       this.shipCounter++;
       return true;
     },
@@ -167,7 +167,7 @@ function computerPlacement(computerGB) {
     return [generateRandom(10), generateRandom(10)];
   }
 
-  function createShipCoords(length) {
+  function createShipCoords(length, type) {
     let shipAdded = false;
     while (!shipAdded) {
       const direction = generateRandom(2);
@@ -192,9 +192,9 @@ function computerPlacement(computerGB) {
 
       const initialShipCount = computerGB.shipCounter;
       if (direction === 0) {
-        computerGB.addShip([a, b], [a, bOnTheGrid]);
+        computerGB.addShip([a, b], [a, bOnTheGrid], type);
       } else {
-        computerGB.addShip([a, b], [aOnTheGrid, b]);
+        computerGB.addShip([a, b], [aOnTheGrid, b], type);
       }
 
       // Check if the ship was successfully added
@@ -205,8 +205,23 @@ function computerPlacement(computerGB) {
   }
 
   // Ship lengths as required
-  const shipLengths = [5, 4, 4, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2];
-  shipLengths.forEach((length) => createShipCoords(length));
+  const shipLengths = [
+    [5, "Carrier"],
+    [4, "Battleship"],
+    [4, "Battleship"],
+    [3, "Destroyer"],
+    [3, "Destroyer"],
+    [3, "Destroyer"],
+    [3, "Submarine"],
+    [3, "Submarine"],
+    [3, "Submarine"],
+    [2, "Patrol-Boat"],
+    [2, "Patrol-Boat"],
+    [2, "Patrol-Boat"],
+    [2, "Patrol-Boat"],
+    [2, "Patrol-Boat"],
+  ];
+  shipLengths.forEach(([length, type]) => createShipCoords(length, type));
 
   return computerGB;
 }

@@ -1,6 +1,7 @@
-function newShip(length) {
+function newShip(length, type) {
   return {
     length: length,
+    type: type,
     hits: 0,
     sunk: false,
     isSunk() {
