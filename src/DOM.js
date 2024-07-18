@@ -87,6 +87,7 @@ function addShipPositions(game) {
 
 // Function to add event listener to each square for the player to play on
 function playerPlay(game, playing, notPlaying) {
+  sinkAShip(playing, notPlaying);
   for (let i = 0; i < 10; i++) {
     for (let j = 10; j < 20; j++) {
       const square = document.getElementsByClassName(`your-space ${j} ${i}`);
@@ -98,10 +99,118 @@ function playerPlay(game, playing, notPlaying) {
           computerAttack(game.player1);
           clearDisplay();
           entireDisplay(playing, notPlaying);
+          sinkAShip(playing, notPlaying);
         });
       });
     }
   }
+}
+
+function sinkAShip(playing, notPlaying) {
+  let myCarrier = 0;
+  let myBattleship = 0;
+  let myDestroyer = 0;
+  let mySubmarine = 0;
+  let myPatrolBoat = 0;
+  let yourCarrier = 0;
+  let yourBattleship = 0;
+  let yourDestroyer = 0;
+  let yourSubmarine = 0;
+  let yourPatrolBoat = 0;
+
+  for (let i = 0; i < playing.ships.length; i++) {
+    console.log(playing.ships[i].sunk);
+    console.log(playing.ships[i].type);
+    if (playing.ships[i].sunk === false) {
+      if (playing.ships[i].type === "Carrier") {
+        myCarrier++;
+      } else if (playing.ships[i].type === "Battleship") {
+        myBattleship++;
+      } else if (playing.ships[i].type === "Destroyer") {
+        myDestroyer++;
+      } else if (playing.ships[i].type === "Submarine") {
+        mySubmarine++;
+      } else if (playing.ships[i].type === "Patrol-Boat") {
+        myPatrolBoat++;
+      }
+    }
+  }
+
+  for (let i = 0; i < notPlaying.ships.length; i++) {
+    if (notPlaying.ships[i].sunk === false) {
+      if (notPlaying.ships[i].type === "Carrier") {
+        yourCarrier++;
+      } else if (notPlaying.ships[i].type === "Battleship") {
+        yourBattleship++;
+      } else if (notPlaying.ships[i].type === "Destroyer") {
+        yourDestroyer++;
+      } else if (notPlaying.ships[i].type === "Submarine") {
+        yourSubmarine++;
+      } else if (notPlaying.ships[i].type === "Patrol-Boat") {
+        yourPatrolBoat++;
+      }
+    }
+  }
+
+  const playingCarrier = document.getElementsByClassName("Carrier-number-my");
+  const playingBattleship = document.getElementsByClassName(
+    "Battleship-number-my"
+  );
+  const playingDestroyer = document.getElementsByClassName(
+    "Destroyer-number-my"
+  );
+  const playingSubmarine = document.getElementsByClassName(
+    "Submarine-number-my"
+  );
+  const playingPatrolBoat = document.getElementsByClassName(
+    "Patrol-Boat-number-my"
+  );
+  const notPlayingCarrier = document.getElementsByClassName(
+    "Carrier-number-your"
+  );
+  const notPlayingBattleship = document.getElementsByClassName(
+    "Battleship-number-your"
+  );
+  const notPlayingDestroyer = document.getElementsByClassName(
+    "Destroyer-number-your"
+  );
+  const notPlayingSubmarine = document.getElementsByClassName(
+    "Submarine-number-your"
+  );
+  const notPlayingPatrolBoat = document.getElementsByClassName(
+    "Patrol-Boat-number-your"
+  );
+
+  Array.from(playingCarrier).forEach((carrier) => {
+    carrier.innerHTML = myCarrier;
+  });
+  Array.from(playingBattleship).forEach((battleship) => {
+    battleship.innerHTML = myBattleship;
+  });
+  Array.from(playingDestroyer).forEach((destroyer) => {
+    destroyer.innerHTML = myDestroyer;
+  });
+  Array.from(playingSubmarine).forEach((submarine) => {
+    submarine.innerHTML = mySubmarine;
+  });
+  Array.from(playingPatrolBoat).forEach((patrolBoat) => {
+    patrolBoat.innerHTML = myPatrolBoat;
+  });
+  Array.from(notPlayingCarrier).forEach((carrier) => {
+    carrier.innerHTML = yourCarrier;
+  });
+  Array.from(notPlayingBattleship).forEach((battleship) => {
+    battleship.innerHTML = yourBattleship;
+  });
+  Array.from(notPlayingDestroyer).forEach((destroyer) => {
+    destroyer.innerHTML = yourDestroyer;
+  });
+  Array.from(notPlayingSubmarine).forEach((submarine) => {
+    submarine.innerHTML = yourSubmarine;
+  });
+  Array.from(notPlayingPatrolBoat).forEach((patrolBoat) => {
+    patrolBoat.innerHTML = yourPatrolBoat;
+  });
 }
 
 // Function to start a two-player game
