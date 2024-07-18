@@ -107,8 +107,9 @@ function newGameboard() {
         ) {
           // this.attacks.push(coords);
           this.shipPositions[noTotal][4] = true;
-          if (this.shipPositions[i][2]) {
-            this.ships[this.shipPositions[i][2]].hit();
+          const shipIndex = this.shipPositions[noTotal][2];
+          if (shipIndex !== false) {
+            this.ships[shipIndex].hit();
           }
 
           this.allShipsSunk = this.ships.every((ship) => ship.sunk);
