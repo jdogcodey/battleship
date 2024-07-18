@@ -137,7 +137,14 @@ function createSquares() {
   const squareArray = [];
   for (let i = 0; i < 10; i++) {
     for (let j = 0; j < 10; j++) {
-      squareArray.push([i, j, false, false, false]);
+      squareArray.push([
+        i,
+        j,
+        false, // Number within the ship array of this ship
+        false, // Boat placed on this square
+        false, // Hit on this square
+        false, // Is this square sunk?
+      ]);
     }
   }
   return squareArray;

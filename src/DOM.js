@@ -447,7 +447,45 @@ function clearDisplay() {
   }
 }
 
+// Function to check whether a boat has been sunk
+function checkSunk(player, gameboard) {
+  const ships = player.ships;
+  const shipPositions = player.shipPositions;
+
+  for (let i = 0; i < ships.length; i++) {
+    if (ships[i].sunk === true) {
+      for (let j = 0; j < shipPositions.length; j++) {
+        if (shipPositions[2] === i) {
+          const firstCoord = shipPositions[0];
+          const newFirst = firstCoord + 10;
+          const secondCoord = shipPositions[1];
+
+          const square = document.getElementsByClassName(
+            `${gameboard} ${newFirst} ${secondCoord}`
+          );
+          square.style.backgroundColor = "#000000";
+        }
+      }
+    }
+  }
+}
+
 function entireDisplay(playing, notPlaying) {
+  const playerSunkShips = [];
+  const notPlayingSunkShips = [];
+
+  for (let i = 0; i < playing.ships.length; i++) {
+    if (playing.ships[i].sunk === true) {
+      playerSunkShips.push(i);
+    }
+  }
+
+  for (let i = 0; i < notPlaying.ships.length; i++) {
+    if (notPlaying.ships[i].sunk === true) {
+      notPlayingSunkShips.push(i);
+    }
+  }
+
   for (let i = 0; i < 100; i++) {
     const a = playing.shipPositions[i][0];
     const b = playing.shipPositions[i][1];
@@ -457,7 +495,27 @@ function entireDisplay(playing, notPlaying) {
       `your-space ${a + 10} ${b}`
     );
 
-    if (
+    let imSunk = false;
+    let yourSunk = false;
+
+    for (let j = 0; j < playerSunkShips.length; j++) {
+      if (playerSunkShips[j] === playing.shipPositions[i][2]) {
+        imSunk = true;
+      }
+    }
+
+    for (let j = 0; j < notPlayingSunkShips.length; j++) {
+      if (notPlayingSunkShips[j] === notPlaying.shipPositions[i][2]) {
+        yourSunk = true;
+      }
+    }
+
+    if (imSunk) {
+      console.log("playing sunk");
+      Array.from(mySquare).forEach((square) => {
+        square.style.backgroundColor = "#000000";
+      });
+    } else if (
       playing.shipPositions[i][3] === true &&
       playing.shipPositions[i][4] === true
     ) {
@@ -480,7 +538,12 @@ function entireDisplay(playing, notPlaying) {
       });
     }
 
-    if (
+    if (yourSunk) {
+      console.log("your sunk");
+      Array.from(yourSquare).forEach((square) => {
+        square.style.backgroundColor = "#000000";
+      });
+    } else if (
       notPlaying.shipPositions[i][3] === true &&
       notPlaying.shipPositions[i][4]
     ) {
