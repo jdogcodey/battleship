@@ -38,6 +38,11 @@ function buttonClicker() {
   });
 }
 
+function addName(player1, player1Name, player2, player2Name) {
+  player1.playerName = player1Name;
+  player2.playerName = player2Name;
+}
+
 // Function to start a single-player game
 function singlePlayer(playerName) {
   const singleGame = newGame(); // Create a new game instance
@@ -45,6 +50,7 @@ function singlePlayer(playerName) {
   const playerOne = singleGame.player1;
   singleGame.player2 = computerPlacement(singleGame.player2); // Set up computer as the second player
   console.log(singleGame);
+  addName(singleGame.player1, playerName, singleGame.player2, "The Computer");
   boatPlacement(playerOne, playerName, () => {
     console.log("boat Placement triggered");
     // Start the boat placement phase
@@ -97,9 +103,15 @@ function playerPlay(game, playing, notPlaying) {
           square.removeEventListener("click", clickFunction);
           game.player2.receiveAttack([j - 10, i]);
           computerAttack(game.player1);
-          clearDisplay();
-          entireDisplay(playing, notPlaying);
-          sinkAShip(playing, notPlaying);
+          if (game.player1.allShipsSunk === true) {
+            winner(game.player2.playerName);
+          } else if (game.player2.allShipsSunk === true) {
+            winner(game.player1.playerName);
+          } else {
+            clearDisplay();
+            entireDisplay(playing, notPlaying);
+            sinkAShip(playing, notPlaying);
+          }
         });
       });
     }
@@ -669,6 +681,16 @@ function entireDisplay(playing, notPlaying) {
       });
     }
   }
+}
+
+function winner(name) {
+  const playScreen = document.getElementById("play-screen");
+  const winScreen = document.getElementById("winner");
+  const winTitle = document.getElementById("who-won");
+
+  playScreen.style.display = "none";
+  winScreen.style.display = "inline-block";
+  winTitle.innerHTML = `${name} won!`;
 }
 
 export { buttonClicker };

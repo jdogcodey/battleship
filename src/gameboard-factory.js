@@ -3,6 +3,7 @@ import { newShip } from "./ship-factory";
 
 function newGameboard() {
   return {
+    playerName: null,
     allShipsSunk: false,
     ships: [],
     shipPositions: createSquares(),
@@ -154,14 +155,6 @@ function newGame() {
   return {
     player1: newGameboard(),
     player2: newGameboard(),
-    winner: null,
-    gameOver() {
-      if (this.player1.allShipsSunk) {
-        this.winner = player2;
-      } else if (this.player2.allShipsSunk) {
-        this.winner = this.player1;
-      }
-    },
   };
 }
 

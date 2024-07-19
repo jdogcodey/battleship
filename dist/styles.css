@@ -13,11 +13,11 @@ header {
     margin: 20px;
 }
 
-#placement-screen, #switch-team-screen, #play-screen, #player2, #complete-placement {
+#placement-screen, #switch-team-screen, #play-screen, #player2, #complete-placement, #winner {
     display: none;
 }
 
-#launch-screen, #placement-screen, #switch-team-screen, #play-screen {
+#launch-screen, #placement-screen, #switch-team-screen, #play-screen, #winner {
     background-color: #8D99AE;
     color: #2B2D42;
     border: 2px solid #D90429;
@@ -166,5 +166,10 @@ header {
     display: flex;
     flex-direction: column;
     justify-content: center;
+}
+
+#who-won {
+    text-align: center;
+    font-size: 3rem;
 }
 
