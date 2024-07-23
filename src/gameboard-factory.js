@@ -9,9 +9,6 @@ function newGameboard() {
     shipPositions: createSquares(),
     shipCounter: 0,
     addShip(firstCoord, secondCoord, type) {
-      console.log("Adding ship");
-      console.log(firstCoord);
-      console.log(secondCoord);
       const [a, b] = firstCoord;
       const [x, y] = secondCoord;
       let shipCoordinates = [];
@@ -33,47 +30,28 @@ function newGameboard() {
       if (a === x) {
         // horizontal ship
         for (let i = Math.min(b, y); i <= Math.max(b, y); i++) {
-          console.log("horizontal ship");
           shipCoordinates.push([a, i]);
         }
       } else if (b === y) {
         // vertical ship
         for (let i = Math.min(a, x); i <= Math.max(a, x); i++) {
-          console.log("vertical ship");
           shipCoordinates.push([i, b]);
         }
       } else {
-        console.log("invalid ship placement");
         return; // Invalid ship placement
       }
 
-      console.log(shipCoordinates[0]);
-
       // Check for overlapping ships
       for (let i = 0; i < shipCoordinates.length; i++) {
-        console.log("checking for overlapping ship");
         const noTotal = shipCoordinates[i][0] * 10 + shipCoordinates[i][1];
         if (
           this.shipPositions[noTotal][0] === shipCoordinates[i][0] &&
           this.shipPositions[noTotal][1] === shipCoordinates[i][1] &&
           this.shipPositions[noTotal][3]
         ) {
-          console.log("overlapping");
           return; // Overlapping so return without adding ship
         }
       }
-
-      // // Check for overlapping ships
-      // for (let i = 0; i < shipCoordinates.length; i++) {
-      //   for (let j = 0; j < this.shipPositions.length; j++) {
-      //     if (
-      //       shipCoordinates[i][0] === this.shipPositions[j][0] &&
-      //       shipCoordinates[i][1] === this.shipPositions[j][1]
-      //     ) {
-      //       return; // Overlapping, so return without adding ship
-      //     }
-      //   }
-      // }
 
       for (let i = 0; i < shipCoordinates.length; i++) {
         const noTotal = shipCoordinates[i][0] * 10 + shipCoordinates[i][1];
@@ -82,15 +60,6 @@ function newGameboard() {
         this.shipPositions[noTotal][2] = this.shipCounter;
         this.shipPositions[noTotal][3] = true;
       }
-
-      // // Add ship coordinates
-      // this.shipPositions.push(
-      //   ...shipCoordinates.map((coords) => [
-      //     coords[0],
-      //     coords[1],
-      //     this.shipCounter,
-      //   ])
-      // );
 
       this.ships.push(newShip(shipCoordinates.length, type)); // Use shipCoordinates.length as ship length
       this.shipCounter++;

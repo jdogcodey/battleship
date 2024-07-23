@@ -46,13 +46,10 @@ function addName(player1, player1Name, player2, player2Name) {
 // Function to start a single-player game
 function singlePlayer(playerName) {
   const singleGame = newGame(); // Create a new game instance
-  console.log(singleGame);
   const playerOne = singleGame.player1;
   singleGame.player2 = computerPlacement(singleGame.player2); // Set up computer as the second player
-  console.log(singleGame);
   addName(singleGame.player1, playerName, singleGame.player2, "The Computer");
   boatPlacement(playerOne, playerName, () => {
-    console.log("boat Placement triggered");
     // Start the boat placement phase
     const completePlacementScreen =
       document.getElementById("complete-placement");
@@ -62,9 +59,7 @@ function singlePlayer(playerName) {
     completePlacementScreen.style.display = "grid";
     completePlacementButton.innerHTML = "Battle!";
     completePlacementButton.addEventListener("click", () => {
-      console.log("complete placement clicked");
       // addShipPositions(singleGame);
-      shipPositionDisplay(singleGame.player1.shipPositions, `my-space`);
       launchBattle(() =>
         playerPlay(singleGame, singleGame.player1, singleGame.player2, 1)
       );
@@ -93,6 +88,9 @@ function addShipPositions(game) {
 
 // Function to add event listener to each square for the player to play on
 function playerPlay(game, playing, notPlaying, players) {
+  console.log(`player play`);
+  console.log(playing);
+  console.log(notPlaying);
   let screenTitle = document.getElementsByClassName(`screen-title`);
   if (players === 1) {
     Array.from(screenTitle).forEach((screenTitle) => {
@@ -104,17 +102,23 @@ function playerPlay(game, playing, notPlaying, players) {
     });
   }
 
-  updatePlayNumbers(playing, notPlaying);
+  clearDisplay();
+  shipPositionDisplay(playing, `my-space`);
+  entireDisplay(playing, notPlaying);
 
   for (let i = 0; i < 10; i++) {
     for (let j = 10; j < 20; j++) {
-      const square = document.getElementsByClassName(`your-space ${j} ${i}`);
-      Array.from(square).forEach((square) => {
-        square.addEventListener("click", function clickFunction() {
-          console.log(game);
-          square.removeEventListener("click", clickFunction);
+      let square = [];
+      let number = `${(j - 10) * 10 + i}`;
+      if (!playing.shipPositions[number][4]) {
+        square = document.getElementsByClassName(`your-space ${j} ${i}`);
+      }
+      Array.from(square).forEach((squareElem) => {
+        squareElem.addEventListener("click", function clickFunction() {
           notPlaying.receiveAttack([j - 10, i]);
           if (players === 1) {
+            console.log("players = 1");
+            squareElem.removeEventListener("click", clickFunction);
             computerAttack(playing);
           }
 
@@ -122,25 +126,28 @@ function playerPlay(game, playing, notPlaying, players) {
             winner(game.player2.playerName);
           } else if (game.player2.allShipsSunk === true) {
             winner(game.player1.playerName);
-          } else {
+          } else if (players === 1) {
             clearDisplay();
             entireDisplay(playing, notPlaying);
             updatePlayNumbers(playing, notPlaying);
-          }
-          if (players === 2) {
-            clearDisplay();
+          } else if (players === 2) {
+            Array.from(square).forEach((squareElem) => {
+              console.log(`removing`);
+              console.log(squareElem);
+              squareElem.removeEventListener("click", clickFunction);
+            });
             const switchTeamScreen =
               document.getElementById("switch-team-screen");
             const switchTeamTitle =
               document.getElementById("switch-team-title");
-            const switchTeamButton = document.getElementById("switch-button");
             const playScreen = document.getElementById("play-screen");
+            const switchTeamButton = document.getElementById("switch-button");
             playScreen.style.display = "none";
             switchTeamScreen.style.display = "grid";
             switchTeamTitle.innerHTML = `Pass to ${notPlaying.playerName}`;
             switchTeamButton.innerHTML = `${notPlaying.playerName} ready`;
-            switchTeamButton.addEventListener("click", () => {
-              shipPositionDisplay(notPlaying.shipPositions, `my-space`);
+            switchTeamButton.addEventListener("click", function testFunc() {
+              switchTeamButton.removeEventListener("click", testFunc);
               playerPlay(game, notPlaying, playing, 2);
             });
           }
@@ -163,8 +170,6 @@ function updatePlayNumbers(playing, notPlaying) {
   let yourPatrolBoat = 0;
 
   for (let i = 0; i < playing.ships.length; i++) {
-    console.log(playing.ships[i].sunk);
-    console.log(playing.ships[i].type);
     if (playing.ships[i].sunk === false) {
       if (playing.ships[i].type === "Carrier") {
         myCarrier++;
@@ -309,6 +314,39 @@ function twoPlayer(player1Name, player2Name) {
                   twoPlayerGame.player2,
                   2
                 );
+                // while (
+                //   twoPlayerGame.player1.allShipsSunk !== true &&
+                //   twoPlayerGame.player2.allShipsSunk !== true
+                // ) {
+                //   let whoIsPlaying = twoPlayerGame.player1
+                //     ? twoPlayerGame.player2
+                //     : twoPlayerGame.player1;
+                //   let whoIsNotPlaying = twoPlayerGame.player2
+                //     ? twoPlayerGame.player1
+                //     : twoPlayerGame.player2;
+                //   clearDisplay();
+                //   shipPositionDisplay(whoIsPlaying.shipPositions, "my-space");
+                //   entireDisplay(whoIsPlaying, whoIsNotPlaying);
+                //   updatePlayNumbers(whoIsPlaying, whoIsNotPlaying);
+                //   const switchTeamButton =
+                //     document.getElementById("switch-button");
+                //   switchTeamButton.innerHTML = `${whoIsPlaying.playerName} ready`;
+                //   switchTeamButton.addEventListener(
+                //     "click",
+                //     function testFunction() {
+                //       playerPlay(
+                //         twoPlayerGame,
+                //         whoIsPlaying,
+                //         twoPlayerGame.player2,
+                //         2
+                //       );
+                //       switchTeamButton.removeEventListener(
+                //         "click",
+                //         testFunction
+                //       );
+                //     }
+                //   );
+                // }
               });
             });
           });
@@ -321,6 +359,8 @@ function twoPlayer(player1Name, player2Name) {
 function launchBattle(func) {
   const placementScreen = document.getElementById("placement-screen");
   placementScreen.style.display = "none";
+  const switchTeamScreen = document.getElementById("switch-team-screen");
+  switchTeamScreen.style.display = "none";
   const playScreen = document.getElementById("play-screen");
   playScreen.style.display = "grid";
   func();
@@ -341,7 +381,6 @@ function switchPlayer(previousScreen, switchTitle, switchMessage, buttonFunc) {
 
 // Function to handle the boat placement phase for a player
 function boatPlacement(player, playerName, callback) {
-  console.log("boat placement");
   const playerPlacementScreen = document.getElementById("placement-screen");
   const title = document.getElementsByClassName("screen-title");
   Array.from(title).forEach((title) => {
@@ -456,9 +495,6 @@ function placeBoat(length, player, type, updateBoatNumber) {
       [newj, i - length + 1],
     ];
 
-    console.log(initialSelection);
-    console.log(possibleEnd);
-
     // Remove invalid end positions that overlap existing ships
     const validEnds = possibleEnd.filter((coord) => {
       const xRange = [
@@ -491,10 +527,7 @@ function placeBoat(length, player, type, updateBoatNumber) {
       return; // Exit without decrementing boat count or updating UI
     }
 
-    console.log(validEnds);
-
     validEnds.forEach((coord) => {
-      console.log("valid ends triggered");
       const squareToRead = document.getElementsByClassName(
         `blank-space ${coord[0] + 10} ${coord[1]}`
       );
@@ -503,7 +536,6 @@ function placeBoat(length, player, type, updateBoatNumber) {
         const selectEnd = function (event) {
           event.preventDefault();
           secondSelection = [coord[0], coord[1]];
-          console.log(secondSelection);
           const success = player.addShip(
             initialSelection,
             secondSelection,
@@ -584,8 +616,6 @@ function shipPositionDisplay(playerShipPositions, gameboard) {
     if (playerShipPositions[i][3] === true) {
       const [a, b] = playerShipPositions[i];
       const newA = a + 10;
-      console.log(a);
-      console.log(b);
       const square = document.getElementsByClassName(
         `${gameboard} ${newA} ${b}`
       );
@@ -598,29 +628,20 @@ function shipPositionDisplay(playerShipPositions, gameboard) {
 
 // Function to clear the background for all squares on the screen
 function clearDisplay() {
-  for (let i = 0; i < 10; i++) {
-    for (let j = 10; j < 20; j++) {
-      const mySquare = document.getElementsByClassName(`my-space ${j} ${i}`);
-      const yourSquare = document.getElementsByClassName(
-        `your-space ${j} ${i}`
-      );
-      const blankSquare = document.getElementsByClassName(
-        `blank-space ${j} ${i}`
-      );
-      Array.from(mySquare).forEach((square) => {
-        square.style.background = `#EDF2F4`;
-        square.style.border = `1px solid #8D99AE`;
-      });
-      Array.from(yourSquare).forEach((square) => {
-        square.style.background = `#EDF2F4`;
-        square.style.border = `1px solid #8D99AE`;
-      });
-      Array.from(blankSquare).forEach((square) => {
-        square.style.background = `#EDF2F4`;
-        square.style.border = `1px solid #8D99AE`;
-      });
+  const spaces = ["my-space", "your-space", "blank-space"];
+  console.log("clear display called");
+
+  spaces.forEach((space) => {
+    for (let i = 0; i < 10; i++) {
+      for (let j = 10; j < 20; j++) {
+        const squares = document.getElementsByClassName(`${space} ${j} ${i}`);
+        Array.from(squares).forEach((square) => {
+          square.style.background = "#EDF2F4";
+          square.style.border = "1px solid #8D99AE";
+        });
+      }
     }
-  }
+  });
 }
 
 // Function to check whether a boat has been sunk
@@ -647,8 +668,8 @@ function checkSunk(player, gameboard) {
 }
 
 function entireDisplay(playing, notPlaying) {
-  const playerSunkShips = [];
-  const notPlayingSunkShips = [];
+  let playerSunkShips = [];
+  let notPlayingSunkShips = [];
 
   for (let i = 0; i < playing.ships.length; i++) {
     if (playing.ships[i].sunk === true) {
@@ -687,7 +708,6 @@ function entireDisplay(playing, notPlaying) {
     }
 
     if (imSunk) {
-      console.log("playing sunk");
       Array.from(mySquare).forEach((square) => {
         square.style.backgroundColor = "#000000";
       });
@@ -715,7 +735,6 @@ function entireDisplay(playing, notPlaying) {
     }
 
     if (yourSunk) {
-      console.log("your sunk");
       Array.from(yourSquare).forEach((square) => {
         square.style.backgroundColor = "#000000";
       });
