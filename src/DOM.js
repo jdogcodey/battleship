@@ -86,7 +86,6 @@ function addShipPositions(game) {
   });
 }
 
-// Function to add event listener to each square for the player to play on
 function playerPlay(game, playing, notPlaying, players) {
   console.log(`player play`);
   console.log(playing);
@@ -103,56 +102,63 @@ function playerPlay(game, playing, notPlaying, players) {
   }
 
   clearDisplay();
-  shipPositionDisplay(playing, `my-space`);
+  shipPositionDisplay(playing.shipPositions, `my-space`);
   entireDisplay(playing, notPlaying);
+
+  const squareEventPairs = [];
 
   for (let i = 0; i < 10; i++) {
     for (let j = 10; j < 20; j++) {
-      let square = [];
       let number = `${(j - 10) * 10 + i}`;
       if (!playing.shipPositions[number][4]) {
-        square = document.getElementsByClassName(`your-space ${j} ${i}`);
-      }
-      Array.from(square).forEach((squareElem) => {
-        squareElem.addEventListener("click", function clickFunction() {
-          notPlaying.receiveAttack([j - 10, i]);
-          if (players === 1) {
-            console.log("players = 1");
-            squareElem.removeEventListener("click", clickFunction);
-            computerAttack(playing);
-          }
-
-          if (game.player1.allShipsSunk === true) {
-            winner(game.player2.playerName);
-          } else if (game.player2.allShipsSunk === true) {
-            winner(game.player1.playerName);
-          } else if (players === 1) {
-            clearDisplay();
-            entireDisplay(playing, notPlaying);
-            updatePlayNumbers(playing, notPlaying);
-          } else if (players === 2) {
-            Array.from(square).forEach((squareElem) => {
-              console.log(`removing`);
-              console.log(squareElem);
+        let square = document.getElementsByClassName(`your-space ${j} ${i}`);
+        Array.from(square).forEach((squareElem) => {
+          function clickFunction() {
+            notPlaying.receiveAttack([j - 10, i]);
+            if (players === 1) {
+              console.log("players = 1");
               squareElem.removeEventListener("click", clickFunction);
-            });
-            const switchTeamScreen =
-              document.getElementById("switch-team-screen");
-            const switchTeamTitle =
-              document.getElementById("switch-team-title");
-            const playScreen = document.getElementById("play-screen");
-            const switchTeamButton = document.getElementById("switch-button");
-            playScreen.style.display = "none";
-            switchTeamScreen.style.display = "grid";
-            switchTeamTitle.innerHTML = `Pass to ${notPlaying.playerName}`;
-            switchTeamButton.innerHTML = `${notPlaying.playerName} ready`;
-            switchTeamButton.addEventListener("click", function testFunc() {
-              switchTeamButton.removeEventListener("click", testFunc);
-              playerPlay(game, notPlaying, playing, 2);
-            });
+              computerAttack(playing);
+            }
+
+            if (
+              game.player1.allShipsSunk === true ||
+              game.player2.allShipsSunk === true
+            ) {
+              winner(game);
+            } else if (players === 1) {
+              clearDisplay();
+              entireDisplay(playing, notPlaying);
+              updatePlayNumbers(playing, notPlaying);
+            } else if (players === 2) {
+              // Remove event listeners from all square elements
+              squareEventPairs.forEach(([elem, listener]) => {
+                elem.removeEventListener("click", listener);
+              });
+
+              const switchTeamScreen =
+                document.getElementById("switch-team-screen");
+              const switchTeamTitle =
+                document.getElementById("switch-team-title");
+              const playScreen = document.getElementById("play-screen");
+              const switchTeamButton = document.getElementById("switch-button");
+              playScreen.style.display = "none";
+              switchTeamScreen.style.display = "grid";
+              switchTeamTitle.innerHTML = `Pass to ${notPlaying.playerName}`;
+              switchTeamButton.innerHTML = `${notPlaying.playerName} ready`;
+
+              function switchTeam() {
+                switchTeamButton.removeEventListener("click", switchTeam);
+                switchTeamScreen.style.display = "none";
+                playerPlay(game, notPlaying, playing, 2);
+              }
+              switchTeamButton.addEventListener("click", switchTeam);
+            }
           }
+          squareElem.addEventListener("click", clickFunction);
+          squareEventPairs.push([squareElem, clickFunction]);
         });
-      });
+      }
     }
   }
 }
@@ -308,45 +314,39 @@ function twoPlayer(player1Name, player2Name) {
                 `my-space`
               );
               launchBattle(() => {
-                playerPlay(
-                  twoPlayerGame,
-                  twoPlayerGame.player1,
-                  twoPlayerGame.player2,
-                  2
-                );
-                // while (
-                //   twoPlayerGame.player1.allShipsSunk !== true &&
-                //   twoPlayerGame.player2.allShipsSunk !== true
-                // ) {
-                //   let whoIsPlaying = twoPlayerGame.player1
-                //     ? twoPlayerGame.player2
-                //     : twoPlayerGame.player1;
-                //   let whoIsNotPlaying = twoPlayerGame.player2
-                //     ? twoPlayerGame.player1
-                //     : twoPlayerGame.player2;
-                //   clearDisplay();
-                //   shipPositionDisplay(whoIsPlaying.shipPositions, "my-space");
-                //   entireDisplay(whoIsPlaying, whoIsNotPlaying);
-                //   updatePlayNumbers(whoIsPlaying, whoIsNotPlaying);
-                //   const switchTeamButton =
-                //     document.getElementById("switch-button");
-                //   switchTeamButton.innerHTML = `${whoIsPlaying.playerName} ready`;
-                //   switchTeamButton.addEventListener(
-                //     "click",
-                //     function testFunction() {
-                //       playerPlay(
-                //         twoPlayerGame,
-                //         whoIsPlaying,
-                //         twoPlayerGame.player2,
-                //         2
-                //       );
-                //       switchTeamButton.removeEventListener(
-                //         "click",
-                //         testFunction
-                //       );
-                //     }
-                //   );
-                // }
+                while (
+                  twoPlayerGame.player1.allShipsSunk !== true &&
+                  twoPlayerGame.player2.allShipsSunk !== true
+                ) {
+                  let whoIsPlaying = twoPlayerGame.player2
+                    ? twoPlayerGame.player1
+                    : twoPlayerGame.player2;
+                  let whoIsNotPlaying = twoPlayerGame.player1
+                    ? twoPlayerGame.player2
+                    : twoPlayerGame.player1;
+                  clearDisplay();
+                  shipPositionDisplay(whoIsPlaying.shipPositions, "my-space");
+                  entireDisplay(whoIsPlaying, whoIsNotPlaying);
+                  updatePlayNumbers(whoIsPlaying, whoIsNotPlaying);
+                  const switchTeamButton =
+                    document.getElementById("switch-button");
+                  switchTeamButton.innerHTML = `${whoIsPlaying.playerName} ready`;
+                  switchTeamButton.addEventListener(
+                    "click",
+                    function testFunction() {
+                      playerPlay(
+                        twoPlayerGame,
+                        whoIsPlaying,
+                        twoPlayerGame.player2,
+                        2
+                      );
+                      switchTeamButton.removeEventListener(
+                        "click",
+                        testFunction
+                      );
+                    }
+                  );
+                }
               });
             });
           });
@@ -757,14 +757,18 @@ function entireDisplay(playing, notPlaying) {
   }
 }
 
-function winner(name) {
+function winner(game) {
   const playScreen = document.getElementById("play-screen");
   const winScreen = document.getElementById("winner");
   const winTitle = document.getElementById("who-won");
 
   playScreen.style.display = "none";
   winScreen.style.display = "inline-block";
-  winTitle.innerHTML = `${name} won!`;
+  if (game.player1.allShipsSunk === true) {
+    winTitle.innerHTML = `${game.player2.playerName} won!`;
+  } else {
+    winTitle.innerHTML = `${game.player1.playerName} won!`;
+  }
 }
 
 export { buttonClicker };
