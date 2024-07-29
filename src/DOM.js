@@ -7,6 +7,11 @@ import {
 
 // Function that sets up event listeners for the second player and start battle buttons
 function buttonClicker() {
+  secondPlayerButtonClick();
+  startBattleButtonClick();
+}
+
+function secondPlayerButtonClick() {
   const secondPlayer = document.getElementById("add-second-player");
   const inputSecondPlayer = document.getElementById("player2");
 
@@ -16,7 +21,9 @@ function buttonClicker() {
     secondPlayer.style.display = "none";
     inputSecondPlayer.style.display = "inline-block";
   });
+}
 
+function startBattleButtonClick() {
   const startBattle = document.getElementById("submit");
   const launchScreen = document.getElementById("launch-screen");
   const player2Name = document.getElementById("player2");
@@ -38,52 +45,87 @@ function buttonClicker() {
   });
 }
 
-function addName(player1, player1Name, player2, player2Name) {
-  player1.playerName = player1Name;
-  player2.playerName = player2Name;
-}
-
 // Function to start a single-player game
 function singlePlayer(playerName) {
   const singleGame = newGame(); // Create a new game instance
-  const playerOne = singleGame.player1;
-  singleGame.player2 = computerPlacement(singleGame.player2); // Set up computer as the second player
-  addName(singleGame.player1, playerName, singleGame.player2, "The Computer");
-  boatPlacement(playerOne, playerName, () => {
-    // Start the boat placement phase
-    const completePlacementScreen =
-      document.getElementById("complete-placement");
-    const completePlacementButton = document.getElementById(
-      "complete-placement-button"
-    );
-    completePlacementScreen.style.display = "grid";
-    completePlacementButton.innerHTML = "Battle!";
-    completePlacementButton.addEventListener("click", () => {
-      // addShipPositions(singleGame);
-      launchBattle(() =>
-        playerPlay(singleGame, singleGame.player1, singleGame.player2, 1)
-      );
-    });
+
+  //Rename players for ease of use
+  let playerOne = singleGame.player1;
+  let playerTwo = singleGame.player2;
+
+  // Computer place boats for playerTwo
+  playerTwo = computerPlacement(playerTwo);
+
+  // Name both players
+  addName(playerOne, playerName, playerTwo, "The Computer");
+
+  // Open the placement screen and change title
+  openPlacementScreen(`${playerName} - Place Your Ships!`);
+
+  // Save the configurations of all different types of boat
+  const boatConfig = boats();
+
+  //Update the boats in the table
+  updateBoatNoInPage(boatConfig);
+
+  // Start function to place the boats
+  const placeBoats = placeAndUpdateBoat(boatConfig, playerOne);
+
+  placeBoats.then(() => {
+    console.log("placed baots");
   });
+
+  // boatConfig(playerOne, playerName, () => {
+  //   // Start the boat placement phase
+  //   const completePlacementScreen =
+  //     document.getElementById("complete-placement");
+  //   const completePlacementButton = document.getElementById(
+  //     "complete-placement-button"
+  //   );
+  //   completePlacementScreen.style.display = "grid";
+  //   completePlacementButton.innerHTML = "Battle!";
+  //   completePlacementButton.addEventListener("click", () => {
+  //     // addShipPositions(singleGame);
+  //     launchBattle(() => playerPlay(singleGame, playerOne, playerTwo, 1));
+  //   });
+  // });
+}
+
+function boats() {
+  return [
+    { type: "Carrier", count: 1, length: 5 },
+    { type: "Battleship", count: 2, length: 4 },
+    { type: "Destroyer", count: 3, length: 3 },
+    { type: "Submarine", count: 4, length: 3 },
+    { type: "Patrol-Boat", count: 5, length: 2 },
+  ];
+}
+
+function openPlacementScreen(text) {
+  const playerPlacementScreen = document.getElementById("placement-screen");
+  updateTitle(text);
+  playerPlacementScreen.style.display = "grid";
+}
+
+function addName(player1, player1Name, player2, player2Name) {
+  player1.playerName = player1Name;
+  player2.playerName = player2Name;
 }
 
 function playerPlay(game, playing, notPlaying, players) {
   console.log(`player play`);
   console.log(playing);
   console.log(notPlaying);
-  let screenTitle = document.getElementsByClassName(`screen-title`);
+
   if (players === 1) {
-    Array.from(screenTitle).forEach((screenTitle) => {
-      screenTitle.innerHTML = `Battle!`;
-    });
+    updateTitle(`Battle!`);
   } else {
-    Array.from(screenTitle).forEach((screenTitle) => {
-      screenTitle.innerHTML = `${playing.playerName}`;
-    });
+    updateTitle(`${playing.playerName}`);
   }
 
   clearDisplay();
   shipPositionDisplay(playing.shipPositions, `my-space`);
+  updatePlayNumbers(playing, notPlaying);
   entireDisplay(playing, notPlaying);
 
   for (let i = 0; i < 10; i++) {
@@ -122,33 +164,92 @@ function playerPlay(game, playing, notPlaying, players) {
               switchTeamTitle.innerHTML = `Pass to ${notPlaying.playerName}`;
               switchTeamButton.innerHTML = `${notPlaying.playerName} ready`;
 
-              function switchTeam() {
-                console.log("switch team called");
-                for (let k = 0; k < 10; k++) {
-                  for (let l = 10; l < 20; l++) {
-                    let squareNum = `${l - 10 * 10 + k}`;
-                    let squareNumSquare = document.getElementsByClassName(
-                      `your-space ${l} ${k}`
-                    );
-                    if (!playing.shipPositions[squareNum][4]) {
-                      Array.from(squareNumSquare).forEach((space) => {
-                        space.removeEventListener("click", clickFunction);
-                      });
-                    }
+              for (let k = 0; k < 10; k++) {
+                for (let l = 10; l < 20; l++) {
+                  let squareNum = `${(l - 10) * 10 + k}`;
+                  let squareNumSquare = document.getElementsByClassName(
+                    `your-space ${l} ${k}`
+                  );
+                  if (!playing.shipPositions[squareNum][4]) {
+                    Array.from(squareNumSquare).forEach((space) => {
+                      space.removeEventListener("click", clickFunction);
+                    });
                   }
                 }
-                switchTeamButton.removeEventListener("click", switchTeam);
-                switchTeamScreen.style.display = "none";
-                playScreen.style.display = "grid";
-                playerPlay(game, notPlaying, playing, 2);
+                switchTeamButton.addEventListener("click", () => {
+                  switchTeamButton.removeEventListener("click", switchTeam);
+                  switchTeamScreen.style.display = "none";
+                  playScreen.style.display = "grid";
+                  playerPlay(game, notPlaying, playing, 2);
+                });
               }
-              switchTeamButton.addEventListener("click", switchTeam);
             }
           }
         });
       }
     }
   }
+}
+
+// Function to start a two-player game
+function twoPlayer(player1Name, player2Name) {
+  const twoPlayerGame = newGame();
+  const playerOne = twoPlayerGame.player1;
+  const playerTwo = twoPlayerGame.player2;
+  addName(
+    twoPlayerGame.player1,
+    player1Name,
+    twoPlayerGame.player2,
+    player2Name
+  );
+  const placementScreen = document.getElementById("placement-screen");
+  const completePlacementSection =
+    document.getElementById("complete-placement");
+  const completePlacementButton = document.getElementById(
+    "complete-placement-button"
+  );
+  const switchTeamScreen = document.getElementById("switch-team-screen");
+  const switchTeamTitle = document.getElementById("switch-team-title");
+  const switchTeamButton = document.getElementById("switch-button");
+  boatConfig(playerOne, player1Name, () => {
+    completePlacementSection.style.display = "grid";
+    completePlacementButton.innerHTML = "Confirm Placement";
+    completePlacementButton.addEventListener("click", () => {
+      clearDisplay();
+      completePlacementSection.style.display = "none";
+      placementScreen.style.display = "none";
+      switchTeamScreen.style.display = "grid";
+      switchTeamTitle.innerHTML = `Hand over to ${player2Name}`;
+      switchTeamButton.innerHTML = `${player2Name} ready`;
+      switchTeamButton.addEventListener("click", () => {
+        switchTeamScreen.style.display = `none`;
+        boatConfig(playerTwo, player2Name, () => {
+          completePlacementSection.style.display = "grid";
+          completePlacementButton.addEventListener("click", () => {
+            placementScreen.style.display = "none";
+            switchTeamScreen.style.display = "grid";
+            switchTeamTitle.innerHTML = `Hand over to ${player1Name}`;
+            switchTeamButton.innerHTML = `${player1Name} ready`;
+            switchTeamButton.addEventListener(`click`, () => {
+              switchTeamScreen.style.display = `none`;
+              shipPositionDisplay(
+                twoPlayerGame.player1.shipPositions,
+                `my-space`
+              );
+              launchBattle(() => {
+                playerPlay(
+                  twoPlayerGame,
+                  twoPlayerGame.player1,
+                  twoPlayerGame.player2,
+                  2
+                );
+              });
+            });
+          });
+        });
+      });
+    });
+  });
 }
 
 function updatePlayNumbers(playing, notPlaying) {
@@ -256,67 +357,6 @@ function updatePlayNumbers(playing, notPlaying) {
   });
 }
 
-// Function to start a two-player game
-function twoPlayer(player1Name, player2Name) {
-  const twoPlayerGame = newGame();
-  const playerOne = twoPlayerGame.player1;
-  const playerTwo = twoPlayerGame.player2;
-  addName(
-    twoPlayerGame.player1,
-    player1Name,
-    twoPlayerGame.player2,
-    player2Name
-  );
-  const placementScreen = document.getElementById("placement-screen");
-  const completePlacementSection =
-    document.getElementById("complete-placement");
-  const completePlacementButton = document.getElementById(
-    "complete-placement-button"
-  );
-  const switchTeamScreen = document.getElementById("switch-team-screen");
-  const switchTeamTitle = document.getElementById("switch-team-title");
-  const switchTeamButton = document.getElementById("switch-button");
-  boatPlacement(playerOne, player1Name, () => {
-    completePlacementSection.style.display = "grid";
-    completePlacementButton.innerHTML = "Confirm Placement";
-    completePlacementButton.addEventListener("click", () => {
-      clearDisplay();
-      completePlacementSection.style.display = "none";
-      placementScreen.style.display = "none";
-      switchTeamScreen.style.display = "grid";
-      switchTeamTitle.innerHTML = `Hand over to ${player2Name}`;
-      switchTeamButton.innerHTML = `${player2Name} ready`;
-      switchTeamButton.addEventListener("click", () => {
-        switchTeamScreen.style.display = `none`;
-        boatPlacement(playerTwo, player2Name, () => {
-          completePlacementSection.style.display = "grid";
-          completePlacementButton.addEventListener("click", () => {
-            placementScreen.style.display = "none";
-            switchTeamScreen.style.display = "grid";
-            switchTeamTitle.innerHTML = `Hand over to ${player1Name}`;
-            switchTeamButton.innerHTML = `${player1Name} ready`;
-            switchTeamButton.addEventListener(`click`, () => {
-              switchTeamScreen.style.display = `none`;
-              shipPositionDisplay(
-                twoPlayerGame.player1.shipPositions,
-                `my-space`
-              );
-              launchBattle(() => {
-                playerPlay(
-                  twoPlayerGame,
-                  twoPlayerGame.player1,
-                  twoPlayerGame.player2,
-                  2
-                );
-              });
-            });
-          });
-        });
-      });
-    });
-  });
-}
-
 function launchBattle(func) {
   const placementScreen = document.getElementById("placement-screen");
   placementScreen.style.display = "none";
@@ -327,83 +367,51 @@ function launchBattle(func) {
   func();
 }
 
-// Function to handle the boat placement phase for a player
-function boatPlacement(player, playerName, callback) {
-  const playerPlacementScreen = document.getElementById("placement-screen");
+function updateTitle(text) {
   const title = document.getElementsByClassName("screen-title");
-  Array.from(title).forEach((title) => {
-    title.innerHTML = `${playerName} - Place Your Ships!`;
+  Array.from(title).forEach((box) => {
+    box.innerHTML = text;
   });
-  playerPlacementScreen.style.display = "grid";
-
-  // Define the configurations for each type of boat
-  const boatConfigurations = [
-    { type: "Carrier", count: 1, length: 5 },
-    { type: "Battleship", count: 2, length: 4 },
-    { type: "Destroyer", count: 3, length: 3 },
-    { type: "Submarine", count: 4, length: 3 },
-    { type: "Patrol-Boat", count: 5, length: 2 },
-  ];
-
-  placementSelector(player, boatConfigurations, callback); // Start the placement selector
 }
 
-// Function to initialize the placement selector for each type of boat
-function placementSelector(player, boatConfigurations, callback) {
-  boatConfigurations.forEach((config) => {
-    const boatElements = document.getElementsByClassName(config.type);
+// Function to update the UI with the number of remaining boats
+function updateBoatNoInPage(boatConfig) {
+  boatConfig.forEach((config) => {
     const boatVisual = document.getElementsByClassName(`${config.type}-number`);
-
-    updateBoatNoInPage(boatVisual, config.count); // Update the UI with the number of boats
-    placeAndUpdateBoat(
-      boatElements,
-      config,
-      config.length,
-      boatVisual,
-      player,
-      boatConfigurations,
-      config.type,
-      callback
-    ); // Set up the event listeners for boat placement
+    Array.from(boatVisual).forEach((boat) => {
+      boat.innerText = config.count;
+    });
   });
 }
 
 // Function to handle the placement and updating of boats
-function placeAndUpdateBoat(
-  boatElements,
-  boatNumber,
-  boatLength,
-  boatVisual,
-  player,
-  boatConfigurations,
-  type,
-  callback
-) {
-  Array.from(boatElements).forEach((boat) => {
-    const clickHandler = () => {
-      if (boatNumber.count > 0) {
-        placeBoat(boatLength, player, type, () => {
-          boatNumber.count--;
-          updateBoatNoInPage(boatVisual, boatNumber.count); // Update the UI with the new count
-          if (checkAllBoatsPlaced(boatConfigurations)) callback(); // Call the callback if all boats have been placed
-        });
-      }
-    };
-    boat.removeEventListener("click", clickHandler); // Ensure no duplicate listeners
-    boat.addEventListener("click", clickHandler, false); // Add click listener for placing boats
+function placeAndUpdateBoat(boatConfig, player) {
+  return new Promise((resolve, reject) => {
+    boatConfig.forEach((config) => {
+      const boatElements = document.getElementsByClassName(config.type);
+      Array.from(boatElements).forEach((boat) => {
+        const clickHandler = () => {
+          if (config.count > 0) {
+            // If there are still boats left
+            placeBoat(config.length, player, config.type, () => {
+              config.count--;
+              updateBoatNoInPage(boatConfig);
+              if (checkAllBoatsPlaced(boatConfig)) {
+                resolve(true);
+              }
+            });
+          }
+        };
+        boat.removeEventListener("click", clickHandler);
+        boat.addEventListener("click", clickHandler, false);
+      });
+    });
   });
 }
 
 // Function to check if all boats have been placed
 function checkAllBoatsPlaced(boatConfigurations) {
   return boatConfigurations.every((config) => config.count === 0);
-}
-
-// Function to update the UI with the number of remaining boats
-function updateBoatNoInPage(boatVisual, boatNumber) {
-  Array.from(boatVisual).forEach((boat) => {
-    boat.innerText = boatNumber;
-  });
 }
 
 // Function to handle the placement of a boat on the board

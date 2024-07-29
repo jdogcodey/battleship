@@ -86,19 +86,6 @@ function newGameboard() {
           return;
         }
       }
-
-      //     for (let i = 0; i < this.shipPositions.length; i++) {
-      //       if (
-      //         coords[0] === this.shipPositions[i][0] &&
-      //         coords[1] === this.shipPositions[i][1]
-      //       ) {
-      //         this.ships[this.shipPositions[i][2]].hit();
-      //         this.shipPositions.splice(i, 1);
-      //         this.allShipsSunk = this.ships.every((ship) => ship.sunk);
-      //         return;
-      //       }
-      //     }
-      //     this.attacks.push(coords);
     },
   };
 }
