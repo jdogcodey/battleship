@@ -46,7 +46,7 @@ function startBattleButtonClick() {
 }
 
 // Function to start a single-player game
-function singlePlayer(playerName) {
+async function singlePlayer(playerName) {
   const singleGame = newGame(); // Create a new game instance
 
   //Rename players for ease of use
@@ -60,11 +60,11 @@ function singlePlayer(playerName) {
   addNamesToGameboards(playerOne, playerName, playerTwo, "The Computer");
 
   // Run through the placement of ships
-  const boatPlacement = placeAllBoats(playerOne);
+  const boatPlacement = await placeAllBoats(playerOne);
 
-  boatPlacement.then(() => {
-    console.log("boat placement completed");
-  });
+  if (boatPlacement) {
+    console.log("success");
+  }
 
   // boatConfig(playerOne, playerName, () => {
   //   // Start the boat placement phase
@@ -378,14 +378,13 @@ function updatePlayNumbers(playing, notPlaying) {
   });
 }
 
-function launchBattle(func) {
+function launchBattle() {
   const placementScreen = document.getElementById("placement-screen");
   placementScreen.style.display = "none";
   const switchTeamScreen = document.getElementById("switch-team-screen");
   switchTeamScreen.style.display = "none";
   const playScreen = document.getElementById("play-screen");
   playScreen.style.display = "grid";
-  func();
 }
 
 function updateTitle(text) {
