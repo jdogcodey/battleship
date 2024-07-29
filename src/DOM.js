@@ -63,23 +63,13 @@ async function singlePlayer(playerName) {
   const boatPlacement = await placeAllBoats(playerOne);
 
   if (boatPlacement) {
-    console.log("success");
+    launchBattle();
+    updateTitle(`Battle!`);
+    while (!isGameWon(singleGame)) {
+      await singlePlayRound(singleGame);
+    }
+    winner(singleGame);
   }
-
-  // boatConfig(playerOne, playerName, () => {
-  //   // Start the boat placement phase
-  //   const completePlacementScreen =
-  //     document.getElementById("complete-placement");
-  //   const completePlacementButton = document.getElementById(
-  //     "complete-placement-button"
-  //   );
-  //   completePlacementScreen.style.display = "grid";
-  //   completePlacementButton.innerHTML = "Battle!";
-  //   completePlacementButton.addEventListener("click", () => {
-  //     // addShipPositions(singleGame);
-  //     launchBattle(() => playerPlay(singleGame, playerOne, playerTwo, 1));
-  //   });
-  // });
 }
 
 function placeAllBoats(player) {
@@ -133,21 +123,70 @@ function addNamesToGameboards(player1, player1Name, player2, player2Name) {
   player2.playerName = player2Name;
 }
 
-function playerPlay(game, playing, notPlaying, players) {
-  console.log(`player play`);
-  console.log(playing);
-  console.log(notPlaying);
+function isGameWon(game) {
+  if (
+    game.player1.allShipsSunk === true ||
+    game.player2.allShipsSunk === true
+  ) {
+    return true;
+  } else return false;
+}
 
-  if (players === 1) {
-    updateTitle(`Battle!`);
-  } else {
+function singlePlayRound(game) {
+  return new Promise((resolve) => {
+    fullDisplay(game.player1, game.player2);
+
+    function clickFunction(j, i) {
+      game.player2.receiveAttack([j - 10, i]);
+      computerAttack(game.player1);
+      removeAllEventListeners();
+      console.log(game);
+      resolve(true);
+    }
+
+    function removeAllEventListeners() {
+      for (let i = 0; i < 10; i++) {
+        for (let j = 10; j < 20; j++) {
+          let number = `${(j - 10) * 10 + i}`;
+          if (!game.player2.shipPositions[number][4]) {
+            let squares = document.getElementsByClassName(
+              `your-space ${j} ${i}`
+            );
+            Array.from(squares).forEach((square) => {
+              let newSquare = square.cloneNode(true);
+              square.parentNode.replaceChild(newSquare, square);
+            });
+          }
+        }
+      }
+    }
+
+    for (let i = 0; i < 10; i++) {
+      for (let j = 10; j < 20; j++) {
+        let number = `${(j - 10) * 10 + i}`;
+        if (!game.player2.shipPositions[number][4]) {
+          let squares = document.getElementsByClassName(`your-space ${j} ${i}`);
+          Array.from(squares).forEach((square) => {
+            square.addEventListener("click", () => {
+              console.log(`clicked j:${j} i:${i}`);
+              clickFunction(j, i);
+            });
+          });
+        }
+      }
+    }
+  });
+}
+
+async function playerPlay(game, playing, notPlaying, players) {
+  if (players === 2) {
     updateTitle(`${playing.playerName}`);
   }
 
   clearDisplay();
   shipPositionDisplay(playing.shipPositions, `my-space`);
   updatePlayNumbers(playing, notPlaying);
-  entireDisplay(playing, notPlaying);
+  entireShipDisplay(playing, notPlaying);
 
   for (let i = 0; i < 10; i++) {
     for (let j = 10; j < 20; j++) {
@@ -159,20 +198,8 @@ function playerPlay(game, playing, notPlaying, players) {
           function clickFunction() {
             notPlaying.receiveAttack([j - 10, i]);
             if (players === 1) {
-              console.log("players = 1");
               squareElem.removeEventListener("click", clickFunction);
               computerAttack(playing);
-            }
-
-            if (
-              game.player1.allShipsSunk === true ||
-              game.player2.allShipsSunk === true
-            ) {
-              winner(game);
-            } else if (players === 1) {
-              clearDisplay();
-              entireDisplay(playing, notPlaying);
-              updatePlayNumbers(playing, notPlaying);
             } else if (players === 2) {
               const switchTeamScreen =
                 document.getElementById("switch-team-screen");
@@ -579,7 +606,6 @@ function shipPositionDisplay(playerShipPositions, gameboard) {
 // Function to clear the background for all squares on the screen
 function clearDisplay() {
   const spaces = ["my-space", "your-space", "blank-space"];
-  console.log("clear display called");
 
   spaces.forEach((space) => {
     for (let i = 0; i < 10; i++) {
@@ -594,7 +620,7 @@ function clearDisplay() {
   });
 }
 
-function entireDisplay(playing, notPlaying) {
+function entireShipDisplay(playing, notPlaying) {
   let playerSunkShips = [];
   let notPlayingSunkShips = [];
 
@@ -682,6 +708,12 @@ function entireDisplay(playing, notPlaying) {
       });
     }
   }
+}
+
+function fullDisplay(playing, notPlaying) {
+  clearDisplay();
+  updatePlayNumbers(playing, notPlaying);
+  entireShipDisplay(playing, notPlaying);
 }
 
 function winner(game) {
