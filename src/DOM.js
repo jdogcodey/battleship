@@ -66,6 +66,7 @@ async function singlePlayer(playerName) {
     updateTitle(`Battle!`);
     while (!isGameWon(singleGame)) {
       await playRound(playerOne, playerTwo, singleGame, 1);
+      removeAllEventListeners();
     }
     winner(singleGame);
   }
@@ -136,30 +137,13 @@ function playRound(playing, notPlaying, game, noOfPlayers) {
     fullDisplay(playing, notPlaying);
 
     function clickFunction(j, i) {
+      console.log(notPlaying);
       notPlaying.receiveAttack([j - 10, i]);
       if (noOfPlayers === 1) {
         computerAttack(playing);
       }
-      removeAllEventListeners();
       console.log(game);
       resolve(true);
-    }
-
-    function removeAllEventListeners() {
-      for (let i = 0; i < 10; i++) {
-        for (let j = 10; j < 20; j++) {
-          let number = `${(j - 10) * 10 + i}`;
-          if (!notPlaying.shipPositions[number][4]) {
-            let squares = document.getElementsByClassName(
-              `your-space ${j} ${i}`
-            );
-            Array.from(squares).forEach((square) => {
-              let newSquare = square.cloneNode(true);
-              square.parentNode.replaceChild(newSquare, square);
-            });
-          }
-        }
-      }
     }
 
     for (let i = 0; i < 10; i++) {
@@ -176,6 +160,20 @@ function playRound(playing, notPlaying, game, noOfPlayers) {
       }
     }
   });
+}
+
+function removeAllEventListeners() {
+  console.log("remove event listeners");
+  for (let i = 0; i < 10; i++) {
+    for (let j = 10; j < 20; j++) {
+      let number = `${(j - 10) * 10 + i}`;
+      let squares = document.getElementsByClassName(`your-space ${j} ${i}`);
+      Array.from(squares).forEach((square) => {
+        let newSquare = square.cloneNode(true);
+        square.parentNode.replaceChild(newSquare, square);
+      });
+    }
+  }
 }
 
 async function twoPlayer(player1Name, player2Name) {
@@ -202,7 +200,6 @@ async function twoPlayer(player1Name, player2Name) {
       `${player2Name} ready`
     );
     if (switchedPlacement) {
-      console.log("switch placement triggered");
       const boatPlacementTwo = await placeAllBoats(
         playerTwo,
         "Confirm Placement"
@@ -211,14 +208,18 @@ async function twoPlayer(player1Name, player2Name) {
         let whoIsPlaying = playerOne;
         let whoIsNotPlaying = playerTwo;
         while (!isGameWon(twoPlayerGame)) {
+          console.log("one while loop");
           await switchScreen(
             `Hand over to ${whoIsPlaying.playerName}`,
             `${whoIsPlaying.playerName} ready!`
           );
           launchBattle();
           updateTitle(`${whoIsPlaying.playerName} - Choose your attack!`);
+          console.log(whoIsPlaying);
+          console.log(whoIsNotPlaying);
           await playRound(whoIsPlaying, whoIsNotPlaying, twoPlayerGame, 2);
           [whoIsPlaying, whoIsNotPlaying] = [whoIsNotPlaying, whoIsPlaying];
+          removeAllEventListeners();
         }
         winner(twoPlayerGame);
       }
@@ -627,6 +628,7 @@ function entireShipDisplay(playing, notPlaying) {
     ) {
       Array.from(mySquare).forEach((square) => {
         square.style.border = `1px solid #EF233C`;
+        square.style.backgroundColor = `#8D99AE`;
       });
     }
 
