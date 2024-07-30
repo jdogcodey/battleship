@@ -387,10 +387,12 @@ function boatPlacementScreen(boatConfig, player) {
       Array.from(boatElements).forEach((boat) => {
         const clickHandler = () => {
           if (config.count > 0) {
+            boat.style.backgroundColor = "#D90429";
             // If there are still boats left
             placeIndividualBoat(config.length, player, config.type, () => {
               config.count--;
               updateBoatNoInPage(boatConfig);
+              removeBoatPlaceBackground(boatConfig);
               if (checkAllBoatsPlaced(boatConfig)) {
                 resolve(true);
               }
@@ -400,6 +402,15 @@ function boatPlacementScreen(boatConfig, player) {
         boat.removeEventListener("click", clickHandler);
         boat.addEventListener("click", clickHandler, false);
       });
+    });
+  });
+}
+
+function removeBoatPlaceBackground(boatConfig) {
+  boatConfig.forEach((config) => {
+    const boatElements = document.getElementsByClassName(config.type);
+    Array.from(boatElements).forEach((boat) => {
+      boat.style.backgroundColor = "#8D99AE";
     });
   });
 }
